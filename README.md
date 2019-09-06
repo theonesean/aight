@@ -17,5 +17,5 @@ AIGHT is a command-line tool for getting todo tasks quickly. It's currently very
 * The Trello get should be abstracted.
 * Control flow should be more customizable.
 * Additional integrations with common task software.
-* Customization of app opening protocol.
+* Maintain a list of common task apps and their open commands.
 
