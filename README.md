@@ -60,9 +60,6 @@ command=cat ./TODO.md
 
 ## Improvements
 
-* The path detection should be variablized.
-* The Trello get should be abstracted.
-* Control flow should be more customizable.
-* Additional integrations with common task software.
-* Maintain a list of common task apps and their open commands.
+* Integration with GitHub Projects
+* Ability to filter cards by tag / status
 
