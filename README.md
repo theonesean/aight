@@ -16,7 +16,7 @@ The program looks for its config file in `~/.aight.conf`, `~/.config/aight.conf`
 There are two "predefined" groups that can only exist once. These should appear at the start of your file. `[settings]` refers to global settings that affect the entire program, such as the table width or separation characters. The `[*]` group specifies default values for all of the groups that follow it. For instance, if you are defining many Trello configurations for the same account, you may not want to repeat the API key/token each time.
 
 ```ini
-[default]
+[settings]
 listWidth=40
 borderCharHorizontal=-
 borderCharVertical=|
