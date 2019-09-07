@@ -1,8 +1,9 @@
 {
 	"authors": [
-		"James Fenn & Sean Bailey"
+	    "Sean Bailey",
+		"James Fenn"
 	],
-	"copyright": "Copyright © 2019, James Fenn & Sean Bailey",
+	"copyright": "Copyright © 2019, Sean Bailey",
 	"dependencies": {
 		"inilike": "~>1.1.0",
 		"painlessjson": "~>1.4.0"
