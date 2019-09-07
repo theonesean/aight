@@ -11,12 +11,12 @@ TaskProvider getTaskProvider(ConfigGroup config) {
     switch (config.key) {
         case "trello":
             return new TrelloTaskProvider(
-                config.settings["apiKey"],
-                config.settings["apiToken"],
-                config.settings["boardId"]
+                config.setting("apiKey"),
+                config.setting("apiToken"),
+                config.setting("boardId")
             );
         default:
-            writeln("Cannot resolve config key %s", config.key);
+            writeln("Cannot resolve config key ", config.key);
             return null;
     }
 }
@@ -50,12 +50,12 @@ class TrelloTaskProvider : TaskProvider {
         this.boardId = boardId;
     }
 
-    char[] get(string endpoint) {
-        return get("https://api.trello.com/1/" ~ endpoint ~ format("&key=%s&token=%s", key, token));
+    char[] request(string endpoint) {
+        return get("https://api.trello.com/1/" ~ endpoint ~ "&key=" ~ key ~ "&token=" ~ token);
     }
     
     override List[] getLists() {
-        char[] req = this.get(format("boards/%s?fields=name,url", boardId));
+        char[] req = this.request("boards/" ~ boardId ~ "/lists?cards=all&card_fields=name,url&fields=name,url");
         List[] list = fromJSON!(List[])(parseJSON(req));
         return list;
     }

@@ -9,6 +9,10 @@
 		"inilike": "~>1.1.0",
 		"painlessjson": "~>1.4.0"
 	},
+	"libs": [
+		"curl",
+		"libgit2"
+	],
 	"description": "A command line tool for getting todo tasks quickly.",
 	"license": "GPL-3.0",
 	"name": "aight"

@@ -16,15 +16,39 @@ class ConfigGroup {
         this.settings = settings;
     }
 
+    bool hasSetting(string id) {
+        return (id in settings) !is null;
+    }
+
+    bool isSetting(string id) {
+        return this.hasSetting(id) && this.settings[id] == "true";
+    }
+
+    string setting(string id) {
+        if ((id in this.settings) !is null) {
+            return this.settings[id];
+        } else {
+            throw new Exception("Failed to find setting " ~ id ~ " in group " ~ key);
+        }
+    }
+
+    string setting(string id, string unset) {
+        try {
+            return this.setting(id);
+        } catch (Exception e) {
+            return unset;
+        }
+    }
+
 }
 
-class Config {
+class Config : ConfigGroup {
 
-    string[string] settings;
     ConfigGroup[] services;
     bool helpWanted;
 
     this(string[] args) {
+        super("config", this.settings);
         this.initConfigFiles([
             expandTilde("~/.aight.conf"), 
             expandTilde("~/.config/aight.conf"), 
@@ -68,9 +92,5 @@ class Config {
                 services ~= new ConfigGroup(group.groupName(), groupRef);
             }
         }
-    }
-
-    bool isSetting(string key) {
-        return ((key in settings) !is null) && (settings[key] == "true");
     }
 }
