@@ -6,9 +6,22 @@ import std.stdio;
 import std.path: expandTilde;
 import inilike.file;
 
+class ConfigGroup {
+    
+    string key;
+    string[string] settings;
+
+    this(string key, string[string] settings) {
+        this.key = key;
+        this.settings = settings;
+    }
+
+}
+
 class Config {
 
     string[string] settings;
+    ConfigGroup[] services;
     bool helpWanted;
 
     this(string[] args) {
@@ -42,8 +55,18 @@ class Config {
 
     void initConfigFile(string location) {
         IniLikeFile file = new IniLikeFile(location);
-        foreach (tuple; file.group("settings").byKeyValue()) {
-            settings[tuple.key] = tuple.value;
+        foreach (group; file.byGroup()) {
+            string[string] groupRef;
+
+            foreach (tuple; group.byKeyValue()) {
+                groupRef[tuple.key] = tuple.value;
+            }
+
+            if (group.groupName() == "settings") {
+                this.settings = groupRef;
+            } else {
+                services ~= new ConfigGroup(group.groupName(), groupRef);
+            }
         }
     }
 

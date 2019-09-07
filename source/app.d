@@ -4,6 +4,4 @@ import providers;
 
 void main(string[] args) {
 	Config conf = new Config(args);
-	
-	
 }

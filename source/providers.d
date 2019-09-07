@@ -1,9 +1,25 @@
 module providers;
 
+import std.stdio;
 import std.net.curl: get, HTTP;
 import std.string: format;
 import std.json: parseJSON;
 import painlessjson: fromJSON;
+import config: ConfigGroup;
+
+TaskProvider getTaskProvider(ConfigGroup config) {
+    switch (config.key) {
+        case "trello":
+            return new TrelloTaskProvider(
+                config.settings["apiKey"],
+                config.settings["apiToken"],
+                config.settings["boardId"]
+            );
+        default:
+            writeln("Cannot resolve config key %s", config.key);
+            return null;
+    }
+}
 
 struct CardSymbol {
     string id;
