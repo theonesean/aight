@@ -1,0 +1,9 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"dunit": "1.0.15",
+		"inilike": "1.1.0",
+		"painlessjson": "1.4.0",
+		"painlesstraits": "0.3.0"
+	}
+}

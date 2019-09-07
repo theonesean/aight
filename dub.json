@@ -1,0 +1,13 @@
+{
+	"authors": [
+		"James Fenn & Sean Bailey"
+	],
+	"copyright": "Copyright © 2019, James Fenn & Sean Bailey",
+	"dependencies": {
+		"inilike": "~>1.1.0",
+		"painlessjson": "~>1.4.0"
+	},
+	"description": "A command line tool for getting todo tasks quickly.",
+	"license": "GPL-3.0",
+	"name": "aight"
+}
