@@ -1,6 +1,5 @@
 name: Dlang Package
 
-<<<<<<< HEAD
 on:
   push:
     paths:
@@ -10,9 +9,6 @@ on:
     paths:
       - 'source/*'
       - '*.json'
-=======
-on: push
->>>>>>> actions
 
 jobs:
   test:
@@ -21,15 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: "Setup Dlang"
-<<<<<<< HEAD
-        run: |-
-          sudo wget http://master.dl.sourceforge.net/project/d-apt/files/d-apt.list -O /etc/apt/sources.list.d/d-apt.list
-          sudo apt-get update && sudo apt-get -y --allow-unauthenticated install --reinstall d-apt-keyring
-          sudo apt-get update && sudo apt-get install dmd-compiler dub
-
-      - name: "Test"
-        run: dub test
-=======
         run: curl https://dlang.org/install.sh | bash -s
       - name: "Install Dependencies"
         run: sudo apt-get install -y libgit2-dev
@@ -37,4 +24,3 @@ jobs:
         run: |
           source ~/dlang/dmd-*/activate
           make test
->>>>>>> actions
