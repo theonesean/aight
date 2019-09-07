@@ -1,15 +1,26 @@
 # AIGHT
 
-AIGHT is a command-line tool for getting todo tasks quickly. It's currently very basic.
+AIGHT is a command-line tool for getting todo tasks quickly.
 
-**To use Trello integration**, set the following environment variables:
+## Building
 
-* `$TRELLO_KEY` - your Trello API developer key
-* `$TRELLO_TOKEN` - your invididual account's Trello token
+```bash
+git clone https://github.com/theonesean/AIGHT.git
+make && make install
+```
 
-`todolist` and `doinglist` in the script are the boards that the script grabs from, by default. 
+## Configuration
 
-**Default behaviour** opens [Things](https://culturedcode.com), my Mac task app of choice, using Mac's very handy `open` command and an X-Callback-URL to open the "Today" pane.
+The program looks for its config file in `~/.aight.conf`, `~/.config/aight.conf`, and `/etc/aight.conf`, in that order. It uses an [INI-like](https://github.com/FreeSlave/inilike) format, with each group representing a different project/task implementation (Trello, GitHub Projects, etc...).
+
+### Trello
+
+```ini
+[trello]
+apiKey=<a Trello API developer key>
+apiToken=<your Trello token>
+boardId=<the board to display>
+```
 
 ## Improvements
 
