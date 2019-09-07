@@ -6,6 +6,13 @@ import config: Config, ConfigGroup;
 import providers: List, TaskProvider, getTaskProvider;
 import print: Printer;
 
+/**
+ * Determines whether a particular ConfigGroup matches
+ * the current conditions.
+ *
+ * @param group         The group to match.
+ * @return True if the current conditions are matched.
+ */
 bool matches(ConfigGroup group) {
 	string cwd = getcwd();
 	string matchDir = group.setting("matchDir", null);
@@ -19,7 +26,6 @@ bool matches(ConfigGroup group) {
 	if (matchRemote !is null) {
 		// TODO: replace with actual libgit2 binding
 		auto command = executeShell("git ls-remote --get-url");
-		writeln(command.output);
 		if (command.status == 0 && globMatch(command.output, matchRemote))
 			return true;
 	}

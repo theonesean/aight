@@ -27,14 +27,33 @@ class Printer {
         this.listWidth = to!int(conf.setting("listWidth", "40"));
     }
 
+    /**
+     * Get the string to represent an outer row.
+     *
+     * @param width         The width of the table.
+     */
     string getRowOuter(int width) {
         return replicate(this.hbchar, width);
     }
 
+    /**
+     * Get the string to represent an inner row.
+     *
+     * @param width         The width of the table.
+     */
     string getRowInner(int width) {
         return this.vbchar ~ replicate(this.hbchar, width - 2) ~ this.vbchar;
     }
 
+    /**
+     * Get the string to represent a row with content.
+     *
+     * If the content is too large for the row, it will
+     * be truncated to fit.
+     *
+     * @param width         The width of the content.
+     * @param content       The content of the row.
+     */
     string getRowContent(int width, string content) {
         if (content.length > width - 4)
             content = format("%-.*s...", width - 7, content);
@@ -73,8 +92,7 @@ class Printer {
     		string[] rows = printList(list, size);
     		if (print.length == 0)
     			print = rows;
-    
-    		for (int i = 0; i < rows.length; i++) {
+            else for (int i = 0; i < rows.length; i++) {
     			print[i] ~= rows[i][1 .. $];
     		}
     	}

@@ -11,19 +11,44 @@ class ConfigGroup {
     string key;
     string[string] settings;
 
+    /**
+     * A generic group of configuration settings.
+     *
+     * @param key           The group key/id.
+     * @param settings      The current setting values.
+     */
     this(string key, string[string] settings) {
         this.key = key;
         this.settings = settings;
     }
 
+    /**
+     * Determine if a setting exists.
+     *
+     * @param id            The id/key of the setting.
+     * @return True if the setting exists.
+     */
     bool hasSetting(string id) {
         return (id in settings) !is null;
     }
 
+    /**
+     * Determine if a setting is "true".
+     *
+     * @param id            The id/key of the setting.
+     * @return True if the setting exists and is "true".
+     */
     bool isSetting(string id) {
         return this.hasSetting(id) && this.settings[id] == "true";
     }
 
+    /**
+     * Get the value of a setting.
+     *
+     * @param id            The id/key of the setting.
+     * @return The value of the setting.
+     * @throws Exception if the setting does not exist.
+     */
     string setting(string id) {
         if ((id in this.settings) !is null) {
             return this.settings[id];
@@ -32,6 +57,14 @@ class ConfigGroup {
         }
     }
 
+    /**
+     * Get the value of a setting.
+     *
+     * @param id            The id/key of the setting.
+     * @param unset         The value to return if the
+     *                      setting does not exist.
+     * @return The value of the setting.
+     */
     string setting(string id, string unset) {
         try {
             return this.setting(id);
