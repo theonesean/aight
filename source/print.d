@@ -61,6 +61,10 @@ class Printer {
         return format("%s %-*s %s", vbchar, width - 4, content, vbchar);
     }
 
+    string[] printList(List list) {
+        return this.printList(list, this.listWidth * 2);
+    }
+
     string[] printList(List list, int height) {
 	    string[] render;
 	    render ~= getRowOuter(listWidth);
@@ -69,8 +73,8 @@ class Printer {
 
 	    for (int i = 0; i < list.cards.length || i < height; i++) {
 	    	if (i < list.cards.length) {
-	    		CardSymbol card = list.cards[i];
-	    		render ~= getRowContent(listWidth, format("%s: %s", card.id[$-5 .. $], card.name));
+	    		Task card = list.cards[i];
+	    		render ~= getRowContent(listWidth, format("%s: %s", card.shortLink, card.name));
 	    	} else {
 	    		render ~= getRowContent(listWidth, " ");
 	    	}

@@ -39,15 +39,18 @@ TaskProvider getTaskProvider(ConfigGroup config) {
     }
 }
 
-struct CardSymbol {
+struct Task {
     string id;
+    string shortLink;
+    string shortUrl;
     string name;
+    string desc;
 }
 
 struct List {
     string id;
     string name;
-    CardSymbol[] cards;
+    Task[] cards;
 }
 
 interface TaskProvider {
@@ -86,7 +89,7 @@ class TrelloTaskProvider : TaskProvider {
      * Get an array of lists of the Trello board.
      */
     override List[] getLists() {
-        char[] req = this.request("boards/" ~ boardId ~ "/lists?cards=all&card_fields=name,url&fields=name,url");
+        char[] req = this.request("boards/" ~ boardId ~ "/lists?cards=all&card_fields=name,shortUrl,shortLink,desc&fields=name");
         List[] list = fromJSON!(List[])(parseJSON(req));
         return list;
     }
