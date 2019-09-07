@@ -1,0 +1,26 @@
+name: Dlang Package
+
+on:
+  push:
+    paths:
+      - 'source/*'
+      - '*.json'
+  pull_request:
+    paths:
+      - 'source/*'
+      - '*.json'
+
+jobs:
+  test:
+    name: "Run tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: "Setup Dlang"
+        run: curl https://dlang.org/install.sh | bash -s
+      - name: "Install Dependencies"
+        run: sudo apt-get install -y libgit2-dev
+      - name: "Test"
+        run: |
+          source ~/dlang/dmd-*/activate
+          make test
