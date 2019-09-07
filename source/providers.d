@@ -6,6 +6,7 @@ import std.string: format;
 import std.json: parseJSON;
 import painlessjson: fromJSON;
 import config: ConfigGroup;
+import std.process: executeShell;
 
 TaskProvider getTaskProvider(ConfigGroup config) {
     switch (config.key) {
@@ -15,9 +16,12 @@ TaskProvider getTaskProvider(ConfigGroup config) {
                 config.setting("apiToken"),
                 config.setting("boardId")
             );
-        default:
-            writeln("Cannot resolve config key ", config.key);
+        case "exec":
+            auto command = executeShell(config.setting("command"));
+            writeln(command.output);
             return null;
+        default:
+            throw new Exception("Cannot resolve config key ", config.key);
     }
 }
 
