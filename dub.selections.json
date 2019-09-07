@@ -1,8 +1,10 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"dlibgit": "0.50.6",
 		"dunit": "1.0.15",
 		"inilike": "1.1.0",
+		"libgit2": "0.20.2+0.20.0",
 		"painlessjson": "1.4.0",
 		"painlesstraits": "0.3.0"
 	}

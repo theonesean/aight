@@ -1,0 +1,26 @@
+name: Dlang Package
+
+on:
+  push:
+    paths:
+      - 'source/*'
+      - '*.json'
+  pull_request:
+    paths:
+      - 'source/*'
+      - '*.json'
+
+jobs:
+  test:
+    name: "Run tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: "Setup Dlang"
+        run: |-
+          sudo wget http://master.dl.sourceforge.net/project/d-apt/files/d-apt.list -O /etc/apt/sources.list.d/d-apt.list
+          sudo apt-get update && sudo apt-get -y --allow-unauthenticated install --reinstall d-apt-keyring
+          sudo apt-get update && sudo apt-get install dmd-compiler dub
+
+      - name: "Test"
+        run: dub test
