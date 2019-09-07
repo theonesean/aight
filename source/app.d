@@ -1,5 +1,5 @@
 import std.stdio: writeln;
-import std.path: globMatch;
+import std.path: globMatch, expandTilde;
 import std.file: getcwd;
 import std.process: executeShell;
 import config: Config, ConfigGroup;
@@ -36,6 +36,19 @@ bool matches(ConfigGroup group) {
 void main(string[] args) {
 	Config conf = new Config(args);
 	Printer printer = new Printer(conf);
+
+	if (conf.helpWanted) {
+		writeln();
+		writeln("Usage: aight");
+		writeln();
+		writeln("Specify configs in the ini-formatted file:");
+		writeln("    ", expandTilde("~/.config/aight.conf"));
+		writeln();
+		writeln("aight@0.0.1 ", args[0]);
+		writeln("    https://github.com/theonesean/AIGHT");
+		writeln();
+		return;
+	}
 	
 	foreach (service; conf.services) {
 		if (!matches(service))
@@ -48,6 +61,15 @@ void main(string[] args) {
     		writeln(str);
     	}
 
-		break;
+		return;
 	}
+
+	writeln();
+	writeln("No matching configuration.");
+	writeln();
+	writeln("Specify configs in the ini-formatted file:");
+	writeln("    ", expandTilde("~/.config/aight.conf"));
+	writeln();
+	writeln("See 'aight --help' for more information.");
+	writeln();
 }
