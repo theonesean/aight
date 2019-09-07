@@ -26,9 +26,9 @@ TaskProvider getTaskProvider(ConfigGroup config) {
     switch (config.key) {
         case "trello":
             return new TrelloTaskProvider(
-                config.setting("apiKey"),
-                config.setting("apiToken"),
-                config.setting("boardId")
+                config.setting("trelloApiKey"),
+                config.setting("trelloApiToken"),
+                config.setting("trelloBoardId")
             );
         case "exec":
             auto command = executeShell(config.setting("command"));

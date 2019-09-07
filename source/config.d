@@ -112,15 +112,25 @@ class Config : ConfigGroup {
 
     void initConfigFile(string location) {
         IniLikeFile file = new IniLikeFile(location);
+        string[string] globalRef;
+
         foreach (group; file.byGroup()) {
             string[string] groupRef;
 
+            // initialize default (global) settings
+            foreach (tuple; globalRef.byKeyValue()) {
+                groupRef[tuple.key] = tuple.value;
+            }
+
+            // overwrite with specific group settings
             foreach (tuple; group.byKeyValue()) {
                 groupRef[tuple.key] = tuple.value;
             }
 
             if (group.groupName() == "settings") {
                 this.settings = groupRef;
+            } else if (group.groupName() == "*") {
+                globalRef = groupRef;
             } else {
                 services ~= new ConfigGroup(group.groupName(), groupRef);
             }
