@@ -13,7 +13,7 @@ make && make install
 
 The program looks for its config file in `~/.aight.conf`, `~/.config/aight.conf`, and `/etc/aight.conf`, in that order. It uses an [INI-like](https://github.com/FreeSlave/inilike) format, with each group representing a different project/task implementation (Trello, GitHub Projects, etc...).
 
-There are two "predefined" groups that can only exist once. These should appear at the start of your file. `[settings]` refers to global settings that affect the entire program, such as the table width or separation characters. The `[*]` group specifies default values for all of the groups that follow it. For instance, if you are defining many Trello configurations for the same account, you may not want to repeat the API key/token each time.
+There are two "predefined" groups that can only exist once. These should appear at the start of your file. `[settings]` refers to global settings that affect the entire program, such as the table width or separation characters. The `[defaults]` group specifies default values for all of the groups that follow it. For instance, if you are defining many Trello configurations for the same account, you may not want to repeat the API key/token each time.
 
 ```ini
 [settings]
@@ -21,7 +21,7 @@ listWidth=40
 borderCharHorizontal=-
 borderCharVertical=|
 
-[*]
+[defaults]
 trelloApiKey=<a Trello API developer key>
 trelloApiToken=<your Trello token>
 ```

@@ -129,7 +129,7 @@ class Config : ConfigGroup {
 
             if (group.groupName() == "settings") {
                 this.settings = groupRef;
-            } else if (group.groupName() == "*") {
+            } else if (group.groupName() == "defaults") {
                 globalRef = groupRef;
             } else {
                 services ~= new ConfigGroup(group.groupName(), groupRef);
