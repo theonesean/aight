@@ -1,7 +1,7 @@
 module print;
 
 import config;
-import providers;
+import tasks;
 import std.format;
 import std.array;
 import std.string;

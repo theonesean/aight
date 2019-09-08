@@ -4,7 +4,7 @@ import std.file: getcwd;
 import std.format: format;
 import std.process: executeShell;
 import config: Config, ConfigGroup;
-import providers;
+import tasks;
 import print: Printer;
 
 /**
