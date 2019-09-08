@@ -71,10 +71,10 @@ class Printer {
 	    render ~= format("%s   %-*s %s", vbchar, listWidth - 6, list.name, vbchar);
 	    render ~= getRowInner(listWidth);
 
-	    for (int i = 0; i < list.cards.length || i < height; i++) {
-	    	if (i < list.cards.length) {
-	    		Task card = list.cards[i];
-	    		render ~= getRowContent(listWidth, format("%s: %s", card.shortLink, card.name));
+	    for (int i = 0; i < list.tasks.length || i < height; i++) {
+	    	if (i < list.tasks.length) {
+	    		Task task = list.tasks[i];
+	    		render ~= getRowContent(listWidth, format("%s: %s", task.humanId, task.name));
 	    	} else {
 	    		render ~= getRowContent(listWidth, " ");
 	    	}
@@ -87,8 +87,8 @@ class Printer {
     string[] printLists(List[] lists) {
     	int size = 0;
     	foreach (list; lists) {
-    		if (list.cards.length > size)
-    			size = to!int(list.cards.length);
+    		if (list.tasks.length > size)
+    			size = to!int(list.tasks.length);
     	}
 
     	string[] print;

@@ -6,8 +6,7 @@
 	"copyright": "Copyright © 2019, Sean Bailey",
 	"dependencies": {
 		"dlibgit": "~>0.50.6",
-		"inilike": "~>1.1.0",
-		"painlessjson": "~>1.4.0"
+		"inilike": "~>1.1.0"
 	},
 	"libs": [
 		"curl"

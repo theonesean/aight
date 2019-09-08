@@ -3,8 +3,7 @@ module providers;
 import std.stdio;
 import std.net.curl: get, HTTP;
 import std.string: format;
-import std.json: parseJSON;
-import painlessjson: fromJSON;
+import std.json: parseJSON, JSONValue;
 import config: ConfigGroup;
 import std.process: executeShell;
 
@@ -41,8 +40,8 @@ TaskProvider getTaskProvider(ConfigGroup config) {
 
 struct Task {
     string id;
-    string shortLink;
-    string shortUrl;
+    string humanId;
+    string url;
     string name;
     string desc;
 }
@@ -50,7 +49,7 @@ struct Task {
 struct List {
     string id;
     string name;
-    Task[] cards;
+    Task[] tasks;
 }
 
 interface TaskProvider {
@@ -84,13 +83,41 @@ class TrelloTaskProvider : TaskProvider {
     char[] request(string endpoint) {
         return get("https://api.trello.com/1/" ~ endpoint ~ "&key=" ~ key ~ "&token=" ~ token);
     }
+
+    Task parseTask(JSONValue taskJson) {
+        Task task;
+        task.id = taskJson["id"].str();
+        task.humanId = taskJson["shortLink"].str();
+        task.url = taskJson["shortUrl"].str();
+        task.name = taskJson["name"].str();
+        task.desc = taskJson["desc"].str();
+        return task;
+    }
+
+    List parseList(JSONValue listJson) {
+        Task[] tasks;
+        foreach (taskJson; listJson["cards"].array()) {
+            tasks ~= parseTask(taskJson);
+        }
+
+        List list;
+        list.id = listJson["id"].str();
+        list.name = listJson["name"].str();
+        list.tasks = tasks;
+        return list;
+    }
     
     /**
      * Get an array of lists of the Trello board.
      */
     override List[] getLists() {
         char[] req = this.request("boards/" ~ boardId ~ "/lists?cards=all&card_fields=name,shortUrl,shortLink,desc&fields=name");
-        List[] list = fromJSON!(List[])(parseJSON(req));
-        return list;
+
+        List[] lists;
+        foreach (listJson; parseJSON(req).array()) {
+            lists ~= parseList(listJson);
+        }
+
+        return lists;
     }
 }

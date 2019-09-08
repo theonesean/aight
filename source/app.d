@@ -62,7 +62,7 @@ List getNamedList(List[] lists, string name) {
 
 Task getNamedTask(Task[] tasks, string name) {
 	foreach (task; tasks) {
-		if (task.shortLink[0 .. name.length] == name)
+		if (task.humanId[0 .. name.length] == name)
 			return task;
 	}
 
@@ -109,14 +109,14 @@ void main(string[] args) {
 		writeln("List:");
 		writeln("  ", list.name);
 		writeln();
-		foreach(card; list.cards) {
-			writeln(format("%s: %s", card.shortLink, card.name));
+		foreach(task; list.tasks) {
+			writeln(format("%s: %s", task.humanId, task.name));
 		}
 		writeln();
 	} else if (args.length == 3 && args[1] == "show") {
 		Task[] tasks;
 		foreach (list; provider.getLists()) {
-			tasks ~= list.cards;
+			tasks ~= list.tasks;
 		}
 
 		Task task;
@@ -135,7 +135,7 @@ void main(string[] args) {
 			writeln(task.desc);
 		}
 		writeln();
-		writeln(task.shortUrl);
+		writeln(task.url);
 		writeln();
 	}
 }
