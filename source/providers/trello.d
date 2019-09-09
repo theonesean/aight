@@ -1,8 +1,17 @@
 module providers.trello;
 
 import std.json: parseJSON, JSONValue;
-import std.net.curl: get, HTTP;
+import std.net.curl: get;
 import tasks;
+import config;
+
+TrelloTaskProvider construct(ConfigGroup config) {
+    return new TrelloTaskProvider(
+        config.setting("trelloApiKey"),
+        config.setting("trelloApiToken"),
+        config.setting("trelloBoardId")
+    );
+}
 
 class TrelloTaskProvider : TaskProvider {
 

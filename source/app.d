@@ -3,6 +3,7 @@ import std.path: globMatch, expandTilde;
 import std.file: getcwd;
 import std.format: format;
 import std.process: executeShell;
+import std.regex;
 import config: Config, ConfigGroup;
 import tasks;
 import print: Printer;
@@ -27,8 +28,15 @@ bool matches(ConfigGroup group) {
 	if (matchRemote !is null) {
 		// TODO: replace with actual libgit2 binding
 		auto command = executeShell("git ls-remote --get-url");
-		if (command.status == 0 && globMatch(command.output, matchRemote))
+		if (command.status == 0 && globMatch(command.output, matchRemote)) {
+			// capture github repo & provide default repo variable for issue/project boards
+			auto gitreg = ctRegex!(`^(https|git)(:\/\/|@)([^\/:]+)\.([a-z]+)(\/|:)(.+)(\.git|\s)$`);
+			auto capture = matchFirst(command.output, gitreg);
+			if (capture)
+				group.setDefault(capture[3] ~ "Repo", capture[6]);
+
 			return true;
+		}
 	}
 
 	return false;

@@ -4,8 +4,8 @@ ifdef USEINSTALL
 INSTALLEXEC := install -Dm755
 INSTALL := install -Dm644
 else
-INSTALLEXEC := sudo cp
-INSTALL := sudo cp
+INSTALLEXEC := sudo cp -f
+INSTALL := sudo cp -f
 endif
 
 all: build test
@@ -15,9 +15,7 @@ install: build
 	$(INSTALLEXEC) "./aight" "${DESTDIR}/usr/bin/aight"
 	$(INSTALL) "./LICENSE" "${DESTDIR}/usr/share/licenses/aight/LICENSE"
 
-build: aight
-
-aight: source/*
+build:
 	dub build
 
 test:

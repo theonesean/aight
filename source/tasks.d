@@ -4,6 +4,7 @@ import std.stdio;
 import config: ConfigGroup;
 import std.process: executeShell;
 import providers.trello;
+import providers.github;
 
 /**
  * Get the task provider that matches a specific
@@ -22,11 +23,9 @@ import providers.trello;
 TaskProvider getTaskProvider(ConfigGroup config) {
     switch (config.key) {
         case "trello":
-            return new TrelloTaskProvider(
-                config.setting("trelloApiKey"),
-                config.setting("trelloApiToken"),
-                config.setting("trelloBoardId")
-            );
+            return providers.trello.construct(config);
+        case "github":
+            return providers.github.construct(config);
         case "exec":
             auto command = executeShell(config.setting("command"));
             writeln(command.output);

@@ -73,6 +73,11 @@ class ConfigGroup {
         }
     }
 
+    void setDefault(string id, string value) {
+        if (!this.hasSetting(id))
+            this.settings[id] = value;
+    }
+
 }
 
 class Config : ConfigGroup {
