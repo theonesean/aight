@@ -2,22 +2,15 @@ module providers.github;
 
 import std.json: parseJSON, JSONValue;
 import std.net.curl: get, HTTP;
-import std.stdio;
+import std.conv;
 import tasks;
 import config;
 
 GitHubTaskProvider construct(ConfigGroup config) {
-    GitHubTaskProvider provider = new GitHubTaskProvider(config.setting("githubApiToken"));
-
-    string githubRepo = config.setting("githubRepo", null);
-    if (githubRepo !is null)
-        provider.setRepo(githubRepo);
-
-    string githubOrg = config.setting("githubOrg", null);
-    if (githubOrg !is null)
-        provider.setOrg(githubOrg);
-
-    return provider;
+    return new GitHubTaskProvider(
+        config.setting("githubApiToken"),
+        config.setting("githubRepo")
+    );
 }
 
 class GitHubTaskProvider : TaskProvider {
@@ -26,19 +19,10 @@ class GitHubTaskProvider : TaskProvider {
     private string entity;
     private string name;
 
-    this(string token) {
+    this(string token, string repo) {
         this.token = token;
-        this.entity = "user";
-    }
-
-    void setRepo(string repo) {
         this.entity = "repos/" ~ repo;
         this.name = repo;
-    }
-
-    void setOrg(string org) {
-        this.entity = "orgs/" ~ org;
-        this.name = '@' ~ org;
     }
 
     /**
@@ -48,7 +32,6 @@ class GitHubTaskProvider : TaskProvider {
      * @param endpoint          The endpoint to send the request to.
      */
     char[] request(string endpoint) {
-        writeln(endpoint);
         auto client = HTTP();
         client.addRequestHeader("Authorization", "bearer " ~ this.token);
         //client.addRequestHeader("Accept", "application/vnd.github.inertia-preview+json");
@@ -58,8 +41,8 @@ class GitHubTaskProvider : TaskProvider {
 
     Task parseIssue(JSONValue taskJson) {
         Task task;
-        task.id = taskJson["id"].str();
-        task.humanId = '#' ~ taskJson["id"].str();
+        task.id = taskJson["id"].toString();
+        task.humanId = taskJson["number"].toString();
         task.url = taskJson["html_url"].str();
         task.name = taskJson["title"].str();
         task.desc = taskJson["body"].str();

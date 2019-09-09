@@ -30,8 +30,7 @@ bool matches(ConfigGroup group) {
 		auto command = executeShell("git ls-remote --get-url");
 		if (command.status == 0 && globMatch(command.output, matchRemote)) {
 			// capture github repo & provide default repo variable for issue/project boards
-			auto gitreg = ctRegex!(`^(https|git)(:\/\/|@)([^\/:]+)\.([a-z]+)(\/|:)(.+)(\.git|\s)$`);
-			auto capture = matchFirst(command.output, gitreg);
+			auto capture = matchFirst(command.output[0 .. $-1], r"^(https|git)(:\/\/|@)([^\/:]+)\.([a-z]+)(\/|:)(.*?)(?:\.git)?$");
 			if (capture)
 				group.setDefault(capture[3] ~ "Repo", capture[6]);
 
