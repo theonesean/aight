@@ -41,10 +41,14 @@ bool matches(ConfigGroup group) {
 	return false;
 }
 
-TaskProvider selectProvider(ConfigGroup[] services) {
-	foreach (service; services) {
-		if (matches(service))
-			return getTaskProvider(service);
+void selectProvider(ConfigGroup[] services, void delegate(TaskProvider, ConfigGroup) run) {
+	foreach (service; services) if (matches(service)) {
+		try {
+			run(getTaskProvider(service), service);
+			return;
+		} catch (Exception e) {
+			continue;
+		}
 	}
 
 	writeln();
@@ -55,7 +59,6 @@ TaskProvider selectProvider(ConfigGroup[] services) {
 	writeln();
 	writeln("See 'aight --help' for more information.");
 	writeln();
-	return null;
 }
 
 List getNamedList(List[] lists, string name) {
@@ -76,6 +79,58 @@ Task getNamedTask(Task[] tasks, string name) {
 	throw new Exception("Couldn't find named task");
 }
 
+void runMain(TaskProvider provider, ConfigGroup conf) {
+	auto printer = new Printer(conf);
+	foreach (str; printer.printLists(provider.getLists())) {
+		writeln(str);
+	}
+}
+
+void runList(TaskProvider provider, string listName) {
+	List list;
+	try {
+		list = getNamedList(provider.getLists(), listName);
+	} catch (Exception e) {
+		writeln("Could not find list ", list);
+		return;
+	}
+
+	writeln();
+	writeln("List:");
+	writeln("  ", list.name);
+	writeln();
+	foreach(task; list.tasks) {
+		writeln(format("%s: %s", task.humanId, task.name));
+	}
+	writeln();
+}
+
+void runShow(TaskProvider provider, string taskName) {
+	Task[] tasks;
+	foreach (list; provider.getLists()) {
+		tasks ~= list.tasks;
+	}
+
+	Task task;
+	try {
+		task = getNamedTask(tasks, taskName);
+	} catch (Exception e) {
+		writeln("Could not find task ", taskName);
+		return;
+	}
+
+	writeln();
+	writeln("Task:");
+	writeln("  ", task.name);
+	if (task.desc !is null && task.desc.length > 0) {
+		writeln();
+		writeln(task.desc);
+	}
+	writeln();
+	writeln(task.url);
+	writeln();
+}
+
 void main(string[] args) {
 	Config conf = new Config(args);
 	if (conf.helpWanted) {
@@ -93,56 +148,14 @@ void main(string[] args) {
 		writeln();
 		return;
 	}
-	
-	TaskProvider provider = selectProvider(conf.services);
-	if (provider is null)
-		return;
 
-	Printer printer = new Printer(conf);
-	if (args.length <= 1) {
-		foreach (str; printer.printLists(provider.getLists())) {
-			writeln(str);
-		}
-	} else if (args.length == 3 && args[1] == "list") {
-		List list;
-		try {
-			list = getNamedList(provider.getLists(), args[2]);
-		} catch (Exception e) {
-			writeln("Could not find list ", args[2]);
-			return;
-		}
+	auto run = (TaskProvider provider, ConfigGroup config) => runMain(provider, conf);
 
-		writeln();
-		writeln("List:");
-		writeln("  ", list.name);
-		writeln();
-		foreach(task; list.tasks) {
-			writeln(format("%s: %s", task.humanId, task.name));
-		}
-		writeln();
+	if (args.length == 3 && args[1] == "list") {
+		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2]);
 	} else if (args.length == 3 && args[1] == "show") {
-		Task[] tasks;
-		foreach (list; provider.getLists()) {
-			tasks ~= list.tasks;
-		}
-
-		Task task;
-		try {
-			task = getNamedTask(tasks, args[2]);
-		} catch (Exception e) {
-			writeln("Could not find task ", args[2]);
-			return;
-		}
-
-		writeln();
-		writeln("Task:");
-		writeln("  ", task.name);
-		if (task.desc !is null && task.desc.length > 0) {
-			writeln();
-			writeln(task.desc);
-		}
-		writeln();
-		writeln(task.url);
-		writeln();
+		run = (TaskProvider provider, ConfigGroup config) => runShow(provider, args[2]);
 	}
+
+	selectProvider(conf.services, run);
 }

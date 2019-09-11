@@ -9,7 +9,7 @@ import std.conv;
 
 class Printer {
 
-    Config conf;
+    ConfigGroup conf;
     
     string bchar;
     string hbchar;
@@ -17,7 +17,7 @@ class Printer {
 
     int listWidth;
 
-    this(Config conf) {
+    this(ConfigGroup conf) {
         this.conf = conf;
 
         this.bchar = conf.setting("borderChar", "*");
