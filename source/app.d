@@ -69,7 +69,7 @@ List getNamedList(List[] lists, string name) {
 
 Task getNamedTask(Task[] tasks, string name) {
 	foreach (task; tasks) {
-		if (task.humanId[0 .. name.length] == name)
+		if (task.humanId.length >= name.length && task.humanId[0 .. name.length] == name)
 			return task;
 	}
 
