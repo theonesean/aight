@@ -4,24 +4,21 @@ import std.json: parseJSON, JSONValue;
 import tasks: List, Task;
 import config: ConfigGroup;
 import providers.github.base;
-
-GitHubProjectsTaskProvider construct(ConfigGroup config) {
-    return new GitHubProjectsTaskProvider(
-        config.setting("githubApiToken"),
-        config.setting("githubRepo"),
-        config.setting("githubProjectId", null)
-    );
-}
+import util.hasher: Hasher;
+import std.conv: to;
 
 class GitHubProjectsTaskProvider : GitHubTaskProvider {
 
-    string repo;
-    string projectId;
+    private string repo;
+    private string projectId;
 
-    this(string token, string repo, string projectId) {
-        super(token);
-        this.repo = repo;
-        this.projectId = projectId;
+    private Hasher hasher;
+
+    this(ConfigGroup config) {
+        super(config);
+        this.repo = config.setting("githubRepo");
+        this.projectId = config.setting("githubProjectId", null);
+        this.hasher = new Hasher();
     }
 
     Task parseCard(JSONValue cardJson) {
@@ -34,10 +31,17 @@ class GitHubProjectsTaskProvider : GitHubTaskProvider {
 
         if (!task.name || task.name == "null" || task.name == "undefined") {
             auto issue = parseJSON(this.request(cardJson["content_url"].str));
-            task.humanId = issue["number"].toString();
+            ulong id = to!ulong(issue["number"].toString()); // JSONValue.uinteger was causing problems
+            if (!hasher.restrict(id))
+                id = hasher.hash(to!string(id));
+
+            task.id = to!string(id);
+            task.humanId = task.id;
             task.name = issue["title"].str;
             task.desc = issue["body"].str;
             task.url = issue["html_url"].str;
+        } else {
+            task.humanId = to!string(hasher.hash(task.id));
         }
 
         return task;

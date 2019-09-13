@@ -47,6 +47,9 @@ void selectProvider(ConfigGroup[] services, void delegate(TaskProvider, ConfigGr
 			run(getTaskProvider(service), service);
 			return;
 		} catch (Exception e) {
+			if (service.isSetting("verbose"))
+				writeln(e, "\n");
+
 			continue;
 		}
 	}
@@ -61,24 +64,6 @@ void selectProvider(ConfigGroup[] services, void delegate(TaskProvider, ConfigGr
 	writeln();
 }
 
-List getNamedList(List[] lists, string name) {
-	foreach (list; lists) {
-		if (list.name == name)
-			return list;
-	}
-
-	throw new Exception("Couldn't find named list.");
-}
-
-Task getNamedTask(Task[] tasks, string name) {
-	foreach (task; tasks) {
-		if (task.humanId.length >= name.length && task.humanId[0 .. name.length] == name)
-			return task;
-	}
-
-	throw new Exception("Couldn't find named task");
-}
-
 void runMain(TaskProvider provider, ConfigGroup conf) {
 	auto printer = new Printer(conf);
 	foreach (str; printer.printLists(provider.getLists())) {
@@ -89,9 +74,9 @@ void runMain(TaskProvider provider, ConfigGroup conf) {
 void runList(TaskProvider provider, string listName) {
 	List list;
 	try {
-		list = getNamedList(provider.getLists(), listName);
+		list = provider.getList(listName);
 	} catch (Exception e) {
-		writeln("Could not find list ", list);
+		writeln("Could not find list ", listName);
 		return;
 	}
 
@@ -106,18 +91,7 @@ void runList(TaskProvider provider, string listName) {
 }
 
 void runShow(TaskProvider provider, string taskName) {
-	Task[] tasks;
-	foreach (list; provider.getLists()) {
-		tasks ~= list.tasks;
-	}
-
-	Task task;
-	try {
-		task = getNamedTask(tasks, taskName);
-	} catch (Exception e) {
-		writeln("Could not find task ", taskName);
-		return;
-	}
+	Task task = provider.getTask(taskName);
 
 	writeln();
 	writeln("Task:");
@@ -151,10 +125,10 @@ void main(string[] args) {
 
 	auto run = (TaskProvider provider, ConfigGroup config) => runMain(provider, conf);
 
-	if (args.length == 3 && args[1] == "list") {
-		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2]);
-	} else if (args.length == 3 && args[1] == "show") {
+	if (args.length >= 3 && args[1] == "show") {
 		run = (TaskProvider provider, ConfigGroup config) => runShow(provider, args[2]);
+	} else if (args.length >= 3 && args[1] == "list") {
+		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2]);
 	}
 
 	selectProvider(conf.services, run);

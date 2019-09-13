@@ -5,20 +5,13 @@ import tasks: List, Task;
 import config: ConfigGroup;
 import providers.github.base;
 
-GitHubTaskProvider construct(ConfigGroup config) {
-    return new GitHubIssuesTaskProvider(
-        config.setting("githubApiToken"),
-        config.setting("githubRepo")
-    );
-}
-
 class GitHubIssuesTaskProvider : GitHubTaskProvider {
 
     private string repo;
 
-    this(string token, string repo) {
-        super(token);
-        this.repo = repo;
+    this(ConfigGroup config) {
+        super(config);
+        this.repo = config.setting("githubRepo");
     }
 
     Task parseIssue(JSONValue taskJson) {
@@ -47,6 +40,11 @@ class GitHubIssuesTaskProvider : GitHubTaskProvider {
     override List[] getLists() {
         char[] req = this.request("repos/" ~ this.repo ~ "/issues");
         return [parseIssues(parseJSON(req), this.repo)];
+    }
+
+    override Task getTask(string id) {
+        char[] req = this.request("repos/" ~ this.repo ~ "/issues/" ~ id);
+        return parseIssue(parseJSON(req));
     }
 
 }

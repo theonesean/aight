@@ -4,14 +4,8 @@ import std.json: parseJSON, JSONValue;
 import std.net.curl: get;
 import tasks;
 import config;
-
-TrelloTaskProvider construct(ConfigGroup config) {
-    return new TrelloTaskProvider(
-        config.setting("trelloApiKey"),
-        config.setting("trelloApiToken"),
-        config.setting("trelloBoardId")
-    );
-}
+import util.hasher: Hasher;
+import std.conv: to;
 
 class TrelloTaskProvider : TaskProvider {
 
@@ -19,10 +13,14 @@ class TrelloTaskProvider : TaskProvider {
     private string token;
     private string boardId;
 
-    this(string key, string token, string boardId) {
-        this.key = key;
-        this.token = token;
-        this.boardId = boardId;
+    private Hasher hasher;
+
+    this(ConfigGroup config) {
+        super(config);
+        this.key = config.setting("trelloApiKey");
+        this.token = config.setting("trelloApiToken");
+        this.boardId = config.setting("trelloBoardId");
+        this.hasher = new Hasher();
     }
 
     /**
@@ -38,7 +36,7 @@ class TrelloTaskProvider : TaskProvider {
     Task parseTask(JSONValue taskJson) {
         Task task;
         task.id = taskJson["id"].str();
-        task.humanId = taskJson["shortLink"].str();
+        task.humanId = to!string(hasher.hash(task.id));
         task.url = taskJson["shortUrl"].str();
         task.name = taskJson["name"].str();
         task.desc = taskJson["desc"].str();

@@ -24,11 +24,11 @@ import providers.github.projects;
 TaskProvider getTaskProvider(ConfigGroup config) {
     switch (config.key) {
         case "trello":
-            return providers.trello.construct(config);
+            return new TrelloTaskProvider(config);
         case "github":
-            return providers.github.issues.construct(config);
+            return new GitHubIssuesTaskProvider(config);
         case "github-projects":
-            return providers.github.projects.construct(config);
+            return new GitHubProjectsTaskProvider(config);
         case "exec":
             auto command = executeShell(config.setting("command"));
             writeln(command.output);
@@ -52,12 +52,38 @@ struct List {
     Task[] tasks;
 }
 
-interface TaskProvider {
+abstract class TaskProvider {
+
+    ConfigGroup config;
+
+    this(ConfigGroup config) {
+        this.config = config;
+    }
 
     /**
      * Get an array of the task lists that are
      * able to be provided.
      */
-    List[] getLists();
+    abstract List[] getLists();
+
+    List getList(string name) {
+        foreach (list; this.getLists()) {
+            if (list.name == name)
+                return list;
+        }
+
+        throw new Exception("Couldn't resolve list: " ~ name);
+    }
+
+    Task getTask(string id) {
+        foreach (list; this.getLists()) {
+            foreach (task; list.tasks) {
+                if (task.humanId == id)
+                    return task;
+            }
+        }
+
+        throw new Exception("Couldn't resolve task: " ~ id);
+    }
     
 }

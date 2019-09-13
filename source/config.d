@@ -87,20 +87,26 @@ class Config : ConfigGroup {
 
     this(string[] args) {
         super("config", this.settings);
+        this.initArguments(args);
         this.initConfigFiles([
             expandTilde("~/.aight.conf"), 
             expandTilde("~/.config/aight.conf"), 
             "/etc/aight.conf"
         ]);
-        this.initArguments(args);
     }
 
     void initArguments(string[] args) {
+        bool verbose = false;
+
         auto helpInfo = getopt(
             args,
-            "set", &(this.settings)
+            "set", &(this.settings),
+            "verbose|v", &verbose
         );
 
+        if (verbose)
+            this.settings["verbose"] = "true";
+        
         this.helpWanted = helpInfo.helpWanted;
     }
 
@@ -117,13 +123,12 @@ class Config : ConfigGroup {
 
     void initConfigFile(string location) {
         IniLikeFile file = new IniLikeFile(location);
-        string[string] globalRef;
 
         foreach (group; file.byGroup()) {
             string[string] groupRef;
 
             // initialize default (global) settings
-            foreach (tuple; globalRef.byKeyValue()) {
+            foreach (tuple; this.settings.byKeyValue()) {
                 groupRef[tuple.key] = tuple.value;
             }
 
@@ -135,7 +140,7 @@ class Config : ConfigGroup {
             if (group.groupName() == "settings") {
                 this.settings = groupRef;
             } else if (group.groupName() == "defaults") {
-                globalRef = groupRef;
+                this.settings = groupRef;
             } else {
                 services ~= new ConfigGroup(group.groupName(), groupRef);
             }
