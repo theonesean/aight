@@ -3,6 +3,7 @@ import std.path: globMatch, expandTilde;
 import std.file: getcwd;
 import std.format: format;
 import std.process: executeShell;
+import std.algorithm.searching: canFind;
 import std.regex;
 import config: Config, ConfigGroup;
 import tasks;
@@ -61,6 +62,35 @@ void selectProvider(ConfigGroup[] services, void delegate(TaskProvider, ConfigGr
 	writeln("    ", expandTilde("~/.config/aight.conf"));
 	writeln();
 	writeln("See 'aight --help' for more information.");
+	writeln();
+}
+
+void runDebugProviders(ConfigGroup[] services) {
+	foreach (service; services) {
+		writeln();
+
+		bool isActive = matches(service);
+		writeln(service.key, " - ",  isActive ? "active" : "inactive");
+
+		// log settings values (only if active)
+		if (isActive) foreach (setting; service.settings.byKeyValue()) {
+			if (setting.key.length < 5 || setting.key[$-5 .. $] != "Token") // don't show tokens
+				writeln("  ", setting.key, ": ", setting.value);
+		}
+
+		if (!isTaskProvider(service))
+			continue;
+
+		try {
+			// execute task provider & check for errors
+			getTaskProvider(service);
+		} catch (Exception e) {
+			if (service.isSetting("verbose"))
+				writeln(e, "\n");
+			else writeln("  Exception: ", e.msg);
+		}
+	}
+
 	writeln();
 }
 
@@ -125,10 +155,13 @@ void main(string[] args) {
 
 	auto run = (TaskProvider provider, ConfigGroup config) => runMain(provider, conf);
 
-	if (args.length >= 3 && args[1] == "show") {
+	if (args.length > 2 && args[1] == "show") {
 		run = (TaskProvider provider, ConfigGroup config) => runShow(provider, args[2]);
-	} else if (args.length >= 3 && args[1] == "list") {
+	} else if (args.length > 2 && canFind(["list", "yinz", "yall", "yous"], args[1])) {
 		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2]);
+	} else if (args.length > 1 && canFind(["list-providers", "peeps"], args[1])) {
+		runDebugProviders(conf.services);
+		return;
 	}
 
 	selectProvider(conf.services, run);

@@ -7,6 +7,10 @@ import providers.trello;
 import providers.github.issues;
 import providers.github.projects;
 
+bool isTaskProvider(ConfigGroup config) {
+    return config.key != "exec";
+}
+
 /**
  * Get the task provider that matches a specific
  * configuration.
@@ -34,7 +38,7 @@ TaskProvider getTaskProvider(ConfigGroup config) {
             writeln(command.output);
             return null;
         default:
-            throw new Exception("Cannot resolve config key ", config.key);
+            throw new Exception("Cannot resolve group key ", config.key);
     }
 }
 
