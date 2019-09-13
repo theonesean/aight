@@ -139,12 +139,17 @@ void main(string[] args) {
 	Config conf = new Config(args);
 	if (conf.helpWanted) {
 		writeln();
-		writeln("Usage: aight");
+		writeln("Usage: aight [command?] [options...]");
 		writeln();
-		writeln("aight list <name>    list the tasks in a category");
+		writeln("aight yinz <name>    list the tasks in a category");
 		writeln("aight show <task>    display the details of a task");
+		writeln("aight peeps          debug config file & list active providers");
 		writeln();
-		writeln("Specify configs in the ini-formatted file:");
+		writeln("Options:");
+		writeln("  --set key=value    override global config options");
+		writeln("  --verbose          show detailed error messages & logs");
+		writeln();
+		writeln("Specify providers in the ini-formatted file:");
 		writeln("    ", expandTilde("~/.config/aight.conf"));
 		writeln();
 		writeln("aight@0.0.1 ", args[0]);
