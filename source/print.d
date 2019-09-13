@@ -1,7 +1,7 @@
 module print;
 
 import config;
-import providers;
+import tasks;
 import std.format;
 import std.array;
 import std.string;
@@ -9,7 +9,7 @@ import std.conv;
 
 class Printer {
 
-    Config conf;
+    ConfigGroup conf;
     
     string bchar;
     string hbchar;
@@ -17,7 +17,7 @@ class Printer {
 
     int listWidth;
 
-    this(Config conf) {
+    this(ConfigGroup conf) {
         this.conf = conf;
 
         this.bchar = conf.setting("borderChar", "*");
@@ -61,16 +61,20 @@ class Printer {
         return format("%s %-*s %s", vbchar, width - 4, content, vbchar);
     }
 
+    string[] printList(List list) {
+        return this.printList(list, this.listWidth * 2);
+    }
+
     string[] printList(List list, int height) {
 	    string[] render;
 	    render ~= getRowOuter(listWidth);
 	    render ~= format("%s   %-*s %s", vbchar, listWidth - 6, list.name, vbchar);
 	    render ~= getRowInner(listWidth);
 
-	    for (int i = 0; i < list.cards.length || i < height; i++) {
-	    	if (i < list.cards.length) {
-	    		CardSymbol card = list.cards[i];
-	    		render ~= getRowContent(listWidth, format("%s: %s", card.id[$-5 .. $], card.name));
+	    for (int i = 0; i < list.tasks.length || i < height; i++) {
+	    	if (i < list.tasks.length) {
+	    		Task task = list.tasks[i];
+	    		render ~= getRowContent(listWidth, format("%s: %s", task.humanId, task.name));
 	    	} else {
 	    		render ~= getRowContent(listWidth, " ");
 	    	}
@@ -83,8 +87,8 @@ class Printer {
     string[] printLists(List[] lists) {
     	int size = 0;
     	foreach (list; lists) {
-    		if (list.cards.length > size)
-    			size = to!int(list.cards.length);
+    		if (list.tasks.length > size)
+    			size = to!int(list.tasks.length);
     	}
 
     	string[] print;

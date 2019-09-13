@@ -73,6 +73,11 @@ class ConfigGroup {
         }
     }
 
+    void setDefault(string id, string value) {
+        if (!this.hasSetting(id))
+            this.settings[id] = value;
+    }
+
 }
 
 class Config : ConfigGroup {
@@ -129,7 +134,7 @@ class Config : ConfigGroup {
 
             if (group.groupName() == "settings") {
                 this.settings = groupRef;
-            } else if (group.groupName() == "*") {
+            } else if (group.groupName() == "defaults") {
                 globalRef = groupRef;
             } else {
                 services ~= new ConfigGroup(group.groupName(), groupRef);

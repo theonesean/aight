@@ -13,7 +13,7 @@ make && make install
 
 The program looks for its config file in `~/.aight.conf`, `~/.config/aight.conf`, and `/etc/aight.conf`, in that order. It uses an [INI-like](https://github.com/FreeSlave/inilike) format, with each group representing a different project/task implementation (Trello, GitHub Projects, etc...).
 
-There are two "predefined" groups that can only exist once. These should appear at the start of your file. `[settings]` refers to global settings that affect the entire program, such as the table width or separation characters. The `[*]` group specifies default values for all of the groups that follow it. For instance, if you are defining many Trello configurations for the same account, you may not want to repeat the API key/token each time.
+There are two "predefined" groups that can only exist once. These should appear at the start of your file. `[settings]` refers to global settings that affect the entire program, such as the table width or separation characters. The `[defaults]` group specifies default values for all of the groups that follow it. For instance, if you are defining many Trello configurations for the same account, you may not want to repeat the API key/token each time.
 
 ```ini
 [settings]
@@ -21,9 +21,9 @@ listWidth=40
 borderCharHorizontal=-
 borderCharVertical=|
 
-[*]
-trelloApiKey=<a Trello API developer key>
-trelloApiToken=<your Trello token>
+[defaults]
+trelloApiKey=a Trello API developer key
+trelloApiToken=your Trello token
 ```
 
 ### Task Providers
@@ -38,15 +38,36 @@ command=open https://youtu.be/dQw4w9WgXcQ
 
 Here is a list of all implemented providers and their configuration values:
 
+#### GitHub Issues
+
+```ini
+[github]
+githubApiToken=a GitHub API token
+githubRepo=the repository to fetch (optional, defaults to matched remote URL)
+```
+
+If the provider is matched by a remote URL of a GitHub repository (using `matchRemote`), the `githubRepo` value will default to its repository name if it is unset.
+
+#### GitHub Projects
+
+**Note:** because of various limitations, the GitHub Projects implementation is currently _very slow_. The API is also a developer preview, so it will likely change at some point in the future.
+
+```ini
+[github-projects]
+githubApiToken=a GitHub API token
+githubRepo=the repository to fetch (optional, defaults to matched remote URL)
+githubProjectId=the project ID (optional, defaults to first project available)
+```
+
 #### Trello
 
 See [trello.com/app-key](https://trello.com/app-key) to obtain an API key / token for this program to use.
 
 ```ini
 [trello]
-trelloApiKey=<a Trello API developer key>
-trelloApiToken=<your Trello token>
-trelloBoardId=<the board to display>
+trelloApiKey=a Trello API developer key
+trelloApiToken=your Trello token
+trelloBoardId=the board to display
 ```
 
 #### Shell Script
@@ -62,4 +83,4 @@ command=cat ./TODO.md
 
 * Integration with GitHub Projects
 * Ability to filter cards by tag / status
-
+* Allow multiple providers to match the same repo

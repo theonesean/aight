@@ -1,9 +1,11 @@
 import std.stdio: writeln;
 import std.path: globMatch, expandTilde;
 import std.file: getcwd;
+import std.format: format;
 import std.process: executeShell;
+import std.regex;
 import config: Config, ConfigGroup;
-import providers: List, TaskProvider, getTaskProvider;
+import tasks;
 import print: Printer;
 
 /**
@@ -26,42 +28,27 @@ bool matches(ConfigGroup group) {
 	if (matchRemote !is null) {
 		// TODO: replace with actual libgit2 binding
 		auto command = executeShell("git ls-remote --get-url");
-		if (command.status == 0 && globMatch(command.output, matchRemote))
+		if (command.status == 0 && globMatch(command.output, matchRemote)) {
+			// capture github repo & provide default repo variable for issue/project boards
+			auto capture = matchFirst(command.output[0 .. $-1], r"^(https|git)(:\/\/|@)([^\/:]+)\.([a-z]+)(\/|:)(.*?)(?:\.git)?$");
+			if (capture)
+				group.setDefault(capture[3] ~ "Repo", capture[6]);
+
 			return true;
+		}
 	}
 
 	return false;
 }
 
-void main(string[] args) {
-	Config conf = new Config(args);
-	Printer printer = new Printer(conf);
-
-	if (conf.helpWanted) {
-		writeln();
-		writeln("Usage: aight");
-		writeln();
-		writeln("Specify configs in the ini-formatted file:");
-		writeln("    ", expandTilde("~/.config/aight.conf"));
-		writeln();
-		writeln("aight@0.0.1 ", args[0]);
-		writeln("    https://github.com/theonesean/AIGHT");
-		writeln();
-		return;
-	}
-	
-	foreach (service; conf.services) {
-		if (!matches(service))
+void selectProvider(ConfigGroup[] services, void delegate(TaskProvider, ConfigGroup) run) {
+	foreach (service; services) if (matches(service)) {
+		try {
+			run(getTaskProvider(service), service);
+			return;
+		} catch (Exception e) {
 			continue;
-
-		TaskProvider provider = getTaskProvider(service);
-		List[] lists = provider.getLists();
-		
-		foreach (str; printer.printLists(lists)) {
-    		writeln(str);
-    	}
-
-		return;
+		}
 	}
 
 	writeln();
@@ -72,4 +59,103 @@ void main(string[] args) {
 	writeln();
 	writeln("See 'aight --help' for more information.");
 	writeln();
+}
+
+List getNamedList(List[] lists, string name) {
+	foreach (list; lists) {
+		if (list.name == name)
+			return list;
+	}
+
+	throw new Exception("Couldn't find named list.");
+}
+
+Task getNamedTask(Task[] tasks, string name) {
+	foreach (task; tasks) {
+		if (task.humanId.length >= name.length && task.humanId[0 .. name.length] == name)
+			return task;
+	}
+
+	throw new Exception("Couldn't find named task");
+}
+
+void runMain(TaskProvider provider, ConfigGroup conf) {
+	auto printer = new Printer(conf);
+	foreach (str; printer.printLists(provider.getLists())) {
+		writeln(str);
+	}
+}
+
+void runList(TaskProvider provider, string listName) {
+	List list;
+	try {
+		list = getNamedList(provider.getLists(), listName);
+	} catch (Exception e) {
+		writeln("Could not find list ", list);
+		return;
+	}
+
+	writeln();
+	writeln("List:");
+	writeln("  ", list.name);
+	writeln();
+	foreach(task; list.tasks) {
+		writeln(format("%s: %s", task.humanId, task.name));
+	}
+	writeln();
+}
+
+void runShow(TaskProvider provider, string taskName) {
+	Task[] tasks;
+	foreach (list; provider.getLists()) {
+		tasks ~= list.tasks;
+	}
+
+	Task task;
+	try {
+		task = getNamedTask(tasks, taskName);
+	} catch (Exception e) {
+		writeln("Could not find task ", taskName);
+		return;
+	}
+
+	writeln();
+	writeln("Task:");
+	writeln("  ", task.name);
+	if (task.desc !is null && task.desc.length > 0) {
+		writeln();
+		writeln(task.desc);
+	}
+	writeln();
+	writeln(task.url);
+	writeln();
+}
+
+void main(string[] args) {
+	Config conf = new Config(args);
+	if (conf.helpWanted) {
+		writeln();
+		writeln("Usage: aight");
+		writeln();
+		writeln("aight list <name>    list the tasks in a category");
+		writeln("aight show <task>    display the details of a task");
+		writeln();
+		writeln("Specify configs in the ini-formatted file:");
+		writeln("    ", expandTilde("~/.config/aight.conf"));
+		writeln();
+		writeln("aight@0.0.1 ", args[0]);
+		writeln("    https://github.com/theonesean/AIGHT");
+		writeln();
+		return;
+	}
+
+	auto run = (TaskProvider provider, ConfigGroup config) => runMain(provider, conf);
+
+	if (args.length == 3 && args[1] == "list") {
+		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2]);
+	} else if (args.length == 3 && args[1] == "show") {
+		run = (TaskProvider provider, ConfigGroup config) => runShow(provider, args[2]);
+	}
+
+	selectProvider(conf.services, run);
 }
