@@ -5,7 +5,7 @@ AIGHT is a command-line tool for getting todo tasks quickly.
 ## Building
 
 ```bash
-git clone https://github.com/theonesean/AIGHT.git
+git clone https://github.com/theonesean/aight.git
 make && make install
 ```
 
