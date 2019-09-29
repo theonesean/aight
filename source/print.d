@@ -7,9 +7,6 @@ import std.array;
 import std.string;
 import std.conv;
 
-// FOR DEBUGGING
-import std.stdio;
-
 class Printer {
 
     ConfigGroup conf;
@@ -71,7 +68,6 @@ class Printer {
     string[] printList(List list) {
 
       if (0 == cmp(this.displayMode, "list")) {
-        //writeln("list.tasks.length = ", list.tasks.length);
         return this.printListWithoutTable(list);
       } else {
         return this.printList(list, this.listWidth * 2);
@@ -142,14 +138,10 @@ class Printer {
           rows = printList(list, size);
         }
 
-    		if (print.length == 0) {
+    		if (lists.length == 1) {
     			print = rows;
         } else if (0 == cmp(this.displayMode, "list")) {
-          print.length = rows.length * lists.length;
-          for (int i = 0; i < rows.length; i++) {
-            if (rows[i]) continue;
-            print[x*i + i] = rows[i];
-          }
+          print ~= rows;
         } else {
           for (int i = 0; i < rows.length; i++) {
       			print[i] ~= rows[i][1 .. $];
