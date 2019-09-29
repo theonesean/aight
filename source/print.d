@@ -10,12 +10,14 @@ import std.conv;
 class Printer {
 
     ConfigGroup conf;
-    
+
     string bchar;
     string hbchar;
     string vbchar;
 
     int listWidth;
+
+    string listMode;
 
     this(ConfigGroup conf) {
         this.conf = conf;
@@ -25,6 +27,8 @@ class Printer {
         this.vbchar = conf.setting("borderCharVertical", "|");
 
         this.listWidth = to!int(conf.setting("listWidth", "40"));
+
+        this.listMode = conf.setting("listMode", "table");
     }
 
     /**
@@ -57,7 +61,7 @@ class Printer {
     string getRowContent(int width, string content) {
         if (content.length > width - 4)
             content = format("%-.*s...", width - 7, content);
-        
+
         return format("%s %-*s %s", vbchar, width - 4, content, vbchar);
     }
 
@@ -92,13 +96,20 @@ class Printer {
     	}
 
     	string[] print;
-    	foreach (list; lists) {
+
+    	foreach (x, list; lists) {
     		string[] rows = printList(list, size);
-    		if (print.length == 0)
+    		if (print.length == 0) {
     			print = rows;
-            else for (int i = 0; i < rows.length; i++) {
-    			print[i] ~= rows[i][1 .. $];
-    		}
+        } else if (0 == cmp(this.listMode, "list")) {
+          for (int i = 0; i < rows.length; i++) {
+            print[x*i] = rows[i];
+          }
+        } else {
+          for (int i = 0; i < rows.length; i++) {
+      			print[i] ~= rows[i][1 .. $];
+      		}
+        }
     	}
 
     	return print;

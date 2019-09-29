@@ -26,6 +26,10 @@ trelloApiKey=a Trello API developer key
 trelloApiToken=your Trello token
 ```
 
+### Display Modes
+
+By default, `aight` will attempt to display multiple task lists (for example, multiple lists within a single Trello board) in ASCII table format, using the `listWidth` and `borderChar` settings and your terminal window width. If you would prefer to have multiple lists displayed one after the other, set `listMode=list`.
+
 ### Task Providers
 
 Task providers are triggered based on a set of conditional attributes such as `matchDir` (to match the current working directory) or `matchRemote` (to match the upstream git URL). The first group to match the current conditions will be executed, and all others will be ignored. As an example, here is a group that will open a URL whenever `aight` is used in one of my repositories:
