@@ -131,12 +131,7 @@ class Printer {
     	string[] print;
 
     	foreach (x, list; lists) {
-        string[] rows;
-        if (isList) {
-          rows = printList(list);
-        } else {
-          rows = printList(list, size);
-        }
+        string[] rows = isList ? printList(list) : printList(list, size);
 
     		if (lists.length == 1) {
     			print = rows;
