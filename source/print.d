@@ -17,7 +17,7 @@ class Printer {
 
     int listWidth;
 
-    string listMode;
+    string displayMode;
 
     this(ConfigGroup conf) {
         this.conf = conf;
@@ -28,7 +28,7 @@ class Printer {
 
         this.listWidth = to!int(conf.setting("listWidth", "40"));
 
-        this.listMode = conf.setting("listMode", "table");
+        this.displayMode = conf.setting("displayMode", "table");
     }
 
     /**
@@ -101,7 +101,7 @@ class Printer {
     		string[] rows = printList(list, size);
     		if (print.length == 0) {
     			print = rows;
-        } else if (0 == cmp(this.listMode, "list")) {
+        } else if (0 == cmp(this.displayMode, "list")) {
           for (int i = 0; i < rows.length; i++) {
             print[x*i] = rows[i];
           }

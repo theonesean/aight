@@ -28,7 +28,7 @@ trelloApiToken=your Trello token
 
 ### Display Modes
 
-By default, `aight` will attempt to display multiple task lists (for example, multiple lists within a single Trello board) in ASCII table format, using the `listWidth` and `borderChar` settings and your terminal window width. If you would prefer to have multiple lists displayed one after the other, set `listMode=list`.
+By default, `aight` will attempt to display multiple task lists (for example, multiple lists within a single Trello board) in ASCII table format, using the `listWidth` and `borderChar` settings and your terminal window width. If you would prefer to have multiple lists displayed one after the other, set `displayMode=list`.
 
 ### Task Providers
 
