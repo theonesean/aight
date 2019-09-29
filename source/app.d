@@ -20,7 +20,7 @@ bool matches(ConfigGroup group) {
 	string cwd = getcwd();
 	string matchDir = group.setting("matchDir", null);
 	string matchRemote = group.setting("matchRemote", null);
-	
+
 	// test working directory
 	if (matchDir !is null && globMatch(cwd, matchDir))
 		return true;
@@ -164,7 +164,7 @@ void main(string[] args) {
 		run = (TaskProvider provider, ConfigGroup config) => runShow(provider, args[2]);
 	} else if (args.length > 2 && canFind(["list", "yinz", "yall", "yous"], args[1])) {
 		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2]);
-	} else if (args.length > 1 && canFind(["list-providers", "peeps"], args[1])) {
+	} else if (args.length > 1 && canFind(["list-providers", "peeps", "folx"], args[1])) {
 		runDebugProviders(conf.services);
 		return;
 	}
