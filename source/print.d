@@ -120,7 +120,7 @@ class Printer {
     }
 
     string[] printLists(List[] lists) {
-      bool isList = (0 == cmp(this.displayMode, "list"));
+      bool isList = ("list" == this.displayMode);
 
     	int size = 0;
     	foreach (list; lists) {
@@ -135,7 +135,7 @@ class Printer {
 
     		if (lists.length == 1) {
     			print = rows;
-        } else if (0 == cmp(this.displayMode, "list")) {
+        } else if (isList) {
           print ~= rows;
         } else {
           for (int i = 0; i < rows.length; i++) {
