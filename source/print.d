@@ -67,7 +67,7 @@ class Printer {
 
     string[] printList(List list) {
 
-      if (0 == cmp(this.displayMode, "list")) {
+      if ("list" == this.displayMode) {
         return this.printListWithoutTable(list);
       } else {
         return this.printList(list, this.listWidth * 2);
