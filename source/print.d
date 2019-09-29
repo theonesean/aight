@@ -72,13 +72,20 @@ class Printer {
 
       if (0 == cmp(this.displayMode, "list")) {
         //writeln("list.tasks.length = ", list.tasks.length);
-        return this.printList(list, to!int(list.tasks.length));
+        return this.printListWithoutTable(list);
       } else {
         return this.printList(list, this.listWidth * 2);
       }
 
     }
 
+    /**
+     * Format a list to a given height to be
+     * printed in a table.
+     *
+     * @param list          The List to be formatted.
+     * @param height        The height of the table.
+     */
     string[] printList(List list, int height) {
 	    string[] render;
 	    render ~= getRowOuter(listWidth);
@@ -98,8 +105,26 @@ class Printer {
 	    return render;
     }
 
+    /**
+     * Formats a list for display
+     * without table formatting.
+     *
+     * @param list          The List to be formatted.
+     */
+    string[] printListWithoutTable(List list) {
+      string[] render;
+      render ~= list.name;
+      render ~= getRowOuter(listWidth);
+      foreach (task; list.tasks) {
+        render ~= format("%s: %s", task.humanId, task.name); // TODO: implement listModePreserveWidth checking
+      }                                                      // possibly look at D string formatting functionality
+      render ~= " ";
+
+      return render;
+    }
+
     string[] printLists(List[] lists) {
-      bool isList = 0 == cmp(this.displayMode, "list");
+      bool isList = (0 == cmp(this.displayMode, "list"));
 
     	int size = 0;
     	foreach (list; lists) {
@@ -122,7 +147,7 @@ class Printer {
         } else if (0 == cmp(this.displayMode, "list")) {
           print.length = rows.length * lists.length;
           for (int i = 0; i < rows.length; i++) {
-            if (rows[i].empty) continue;
+            if (rows[i]) continue;
             print[x*i + i] = rows[i];
           }
         } else {
