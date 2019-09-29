@@ -3,12 +3,15 @@ module providers.github.base;
 import std.net.curl: get, HTTP;
 import std.stdio;
 import tasks;
+import config: ConfigGroup;
 
 abstract class GitHubTaskProvider : TaskProvider {
-    string token;
 
-    this(string token) {
-        this.token = token;
+    private string token;
+
+    this(ConfigGroup config) {
+        super(config);
+        this.token = config.setting("githubApiToken");
     }
 
     /**
@@ -22,6 +25,9 @@ abstract class GitHubTaskProvider : TaskProvider {
         client.addRequestHeader("Authorization", "bearer " ~ this.token);
         client.addRequestHeader("Accept", "application/vnd.github.inertia-preview+json");
 
+        if (this.config.isSetting("verbose"))
+            writeln("GET github:", endpoint);
+
         if (endpoint[0 .. 4] != "http")
             endpoint = "https://api.github.com/" ~ endpoint;
 
@@ -30,4 +36,5 @@ abstract class GitHubTaskProvider : TaskProvider {
     }
 
     override abstract List[] getLists();
+
 }

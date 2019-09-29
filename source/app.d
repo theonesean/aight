@@ -3,6 +3,7 @@ import std.path: globMatch, expandTilde;
 import std.file: getcwd;
 import std.format: format;
 import std.process: executeShell;
+import std.algorithm.searching: canFind;
 import std.regex;
 import config: Config, ConfigGroup;
 import tasks;
@@ -47,6 +48,9 @@ void selectProvider(ConfigGroup[] services, void delegate(TaskProvider, ConfigGr
 			run(getTaskProvider(service), service);
 			return;
 		} catch (Exception e) {
+			if (service.isSetting("verbose"))
+				writeln(e, "\n");
+
 			continue;
 		}
 	}
@@ -61,22 +65,33 @@ void selectProvider(ConfigGroup[] services, void delegate(TaskProvider, ConfigGr
 	writeln();
 }
 
-List getNamedList(List[] lists, string name) {
-	foreach (list; lists) {
-		if (list.name == name)
-			return list;
+void runDebugProviders(ConfigGroup[] services) {
+	foreach (service; services) {
+		writeln();
+
+		bool isActive = matches(service);
+		writeln(service.key, " - ",  isActive ? "active" : "inactive");
+
+		// log settings values (only if active)
+		if (isActive) foreach (setting; service.settings.byKeyValue()) {
+			if (setting.key.length < 5 || setting.key[$-5 .. $] != "Token") // don't show tokens
+				writeln("  ", setting.key, ": ", setting.value);
+		}
+
+		if (!isTaskProvider(service))
+			continue;
+
+		try {
+			// execute task provider & check for errors
+			getTaskProvider(service);
+		} catch (Exception e) {
+			if (service.isSetting("verbose"))
+				writeln(e, "\n");
+			else writeln("  Exception: ", e.msg);
+		}
 	}
 
-	throw new Exception("Couldn't find named list.");
-}
-
-Task getNamedTask(Task[] tasks, string name) {
-	foreach (task; tasks) {
-		if (task.humanId.length >= name.length && task.humanId[0 .. name.length] == name)
-			return task;
-	}
-
-	throw new Exception("Couldn't find named task");
+	writeln();
 }
 
 void runMain(TaskProvider provider, ConfigGroup conf) {
@@ -89,9 +104,9 @@ void runMain(TaskProvider provider, ConfigGroup conf) {
 void runList(TaskProvider provider, string listName) {
 	List list;
 	try {
-		list = getNamedList(provider.getLists(), listName);
+		list = provider.getList(listName);
 	} catch (Exception e) {
-		writeln("Could not find list ", list);
+		writeln("Could not find list ", listName);
 		return;
 	}
 
@@ -106,18 +121,7 @@ void runList(TaskProvider provider, string listName) {
 }
 
 void runShow(TaskProvider provider, string taskName) {
-	Task[] tasks;
-	foreach (list; provider.getLists()) {
-		tasks ~= list.tasks;
-	}
-
-	Task task;
-	try {
-		task = getNamedTask(tasks, taskName);
-	} catch (Exception e) {
-		writeln("Could not find task ", taskName);
-		return;
-	}
+	Task task = provider.getTask(taskName);
 
 	writeln();
 	writeln("Task:");
@@ -135,12 +139,17 @@ void main(string[] args) {
 	Config conf = new Config(args);
 	if (conf.helpWanted) {
 		writeln();
-		writeln("Usage: aight");
+		writeln("Usage: aight [command?] [options...]");
 		writeln();
-		writeln("aight list <name>    list the tasks in a category");
+		writeln("aight yinz <name>    list the tasks in a category");
 		writeln("aight show <task>    display the details of a task");
+		writeln("aight peeps          debug config file & list active providers");
 		writeln();
-		writeln("Specify configs in the ini-formatted file:");
+		writeln("Options:");
+		writeln("  --set key=value    override global config options");
+		writeln("  --verbose          show detailed error messages & logs");
+		writeln();
+		writeln("Specify providers in the ini-formatted file:");
 		writeln("    ", expandTilde("~/.config/aight.conf"));
 		writeln();
 		writeln("aight@0.0.1 ", args[0]);
@@ -151,10 +160,13 @@ void main(string[] args) {
 
 	auto run = (TaskProvider provider, ConfigGroup config) => runMain(provider, conf);
 
-	if (args.length == 3 && args[1] == "list") {
-		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2]);
-	} else if (args.length == 3 && args[1] == "show") {
+	if (args.length > 2 && args[1] == "show") {
 		run = (TaskProvider provider, ConfigGroup config) => runShow(provider, args[2]);
+	} else if (args.length > 2 && canFind(["list", "yinz", "yall", "yous"], args[1])) {
+		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2]);
+	} else if (args.length > 1 && canFind(["list-providers", "peeps"], args[1])) {
+		runDebugProviders(conf.services);
+		return;
 	}
 
 	selectProvider(conf.services, run);
