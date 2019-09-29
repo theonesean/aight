@@ -26,7 +26,7 @@ class TrelloTaskProvider : TaskProvider {
     /**
      * Send an authenticated request to a particular
      * endpoint of the Trello API.
-     * 
+     *
      * @param endpoint          The endpoint to send the request to.
      */
     char[] request(string endpoint) {
@@ -55,7 +55,7 @@ class TrelloTaskProvider : TaskProvider {
         list.tasks = tasks;
         return list;
     }
-    
+
     /**
      * Get an array of lists of the Trello board.
      */

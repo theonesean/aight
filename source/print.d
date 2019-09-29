@@ -10,12 +10,14 @@ import std.conv;
 class Printer {
 
     ConfigGroup conf;
-    
+
     string bchar;
     string hbchar;
     string vbchar;
 
     int listWidth;
+
+    string displayMode;
 
     this(ConfigGroup conf) {
         this.conf = conf;
@@ -25,6 +27,8 @@ class Printer {
         this.vbchar = conf.setting("borderCharVertical", "|");
 
         this.listWidth = to!int(conf.setting("listWidth", "40"));
+
+        this.displayMode = conf.setting("displayMode", "table");
     }
 
     /**
@@ -57,14 +61,27 @@ class Printer {
     string getRowContent(int width, string content) {
         if (content.length > width - 4)
             content = format("%-.*s...", width - 7, content);
-        
+
         return format("%s %-*s %s", vbchar, width - 4, content, vbchar);
     }
 
     string[] printList(List list) {
+
+      if ("list" == this.displayMode) {
+        return this.printListWithoutTable(list);
+      } else {
         return this.printList(list, this.listWidth * 2);
+      }
+
     }
 
+    /**
+     * Format a list to a given height to be
+     * printed in a table.
+     *
+     * @param list          The List to be formatted.
+     * @param height        The height of the table.
+     */
     string[] printList(List list, int height) {
 	    string[] render;
 	    render ~= getRowOuter(listWidth);
@@ -84,7 +101,27 @@ class Printer {
 	    return render;
     }
 
+    /**
+     * Formats a list for display
+     * without table formatting.
+     *
+     * @param list          The List to be formatted.
+     */
+    string[] printListWithoutTable(List list) {
+      string[] render;
+      render ~= list.name;
+      render ~= getRowOuter(listWidth);
+      foreach (task; list.tasks) {
+        render ~= format("%s: %s", task.humanId, task.name); // TODO: implement listModePreserveWidth checking
+      }                                                      // possibly look at D string formatting functionality
+      render ~= " ";
+
+      return render;
+    }
+
     string[] printLists(List[] lists) {
+      bool isList = ("list" == this.displayMode);
+
     	int size = 0;
     	foreach (list; lists) {
     		if (list.tasks.length > size)
@@ -92,13 +129,19 @@ class Printer {
     	}
 
     	string[] print;
-    	foreach (list; lists) {
-    		string[] rows = printList(list, size);
-    		if (print.length == 0)
+
+    	foreach (x, list; lists) {
+        string[] rows = isList ? printList(list) : printList(list, size);
+
+    		if (lists.length == 1) {
     			print = rows;
-            else for (int i = 0; i < rows.length; i++) {
-    			print[i] ~= rows[i][1 .. $];
-    		}
+        } else if (isList) {
+          print ~= rows;
+        } else {
+          for (int i = 0; i < rows.length; i++) {
+      			print[i] ~= rows[i][1 .. $];
+      		}
+        }
     	}
 
     	return print;
