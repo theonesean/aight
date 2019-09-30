@@ -138,8 +138,9 @@ class Printer {
         } else if (isList) {
           print ~= rows;
         } else {
+          print.length = rows.length;
           for (int i = 0; i < rows.length; i++) {
-      			print[i] ~= rows[i][1 .. $];
+      			print[i] ~= rows[i][(x > 0 ? 1 : 0) .. $];
       		}
         }
     	}
