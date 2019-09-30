@@ -68,7 +68,7 @@ class Printer {
      */
     string getRowContent(int width, string content) {
         if (content.length > width - 4)
-            content = format("%-.*s...", width - 7, content);
+            content = format("%-.*s…", width - 5, content);
 
         return format("%s %-*s %s", to!string(borderContent[0]), width - 4, content, to!string(borderContent[2]));
     }
