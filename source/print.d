@@ -11,9 +11,10 @@ class Printer {
 
     ConfigGroup conf;
 
-    string bchar;
-    string hbchar;
-    string vbchar;
+    dstring borderTop;
+    dstring borderContent;
+    dstring borderMiddle;
+    dstring borderBottom;
 
     int listWidth;
 
@@ -22,13 +23,18 @@ class Printer {
     this(ConfigGroup conf) {
         this.conf = conf;
 
-        this.bchar = conf.setting("borderChar", "*");
-        this.hbchar = conf.setting("borderCharHorizontal", "-");
-        this.vbchar = conf.setting("borderCharVertical", "|");
+        this.borderTop = to!dstring(conf.setting("borderTop", "╔═╗"));
+        this.borderContent = to!dstring(conf.setting("borderContent", "║ ║"));
+        this.borderMiddle = to!dstring(conf.setting("borderMiddle", "╟─╢"));
+        this.borderBottom = to!dstring(conf.setting("borderBottom", "╚═╝"));
 
         this.listWidth = to!int(conf.setting("listWidth", "40"));
 
         this.displayMode = conf.setting("displayMode", "table");
+    }
+
+    dstring dreplicate(immutable(dchar) str, int num) {
+      return to!dstring(replicate(to!string(str), num));
     }
 
     /**
@@ -36,8 +42,10 @@ class Printer {
      *
      * @param width         The width of the table.
      */
-    string getRowOuter(int width) {
-        return replicate(this.hbchar, width);
+    dstring getRowOuter(int width, bool bottom) {
+      if (bottom)
+        return this.borderBottom[0] ~ dreplicate(this.borderBottom[1], width - 2) ~ this.borderBottom[2];
+      else return this.borderTop[0] ~ dreplicate(this.borderTop[1], width - 2) ~ this.borderTop[2];
     }
 
     /**
@@ -45,8 +53,8 @@ class Printer {
      *
      * @param width         The width of the table.
      */
-    string getRowInner(int width) {
-        return this.vbchar ~ replicate(this.hbchar, width - 2) ~ this.vbchar;
+    dstring getRowInner(int width) {
+        return this.borderMiddle[0] ~ dreplicate(this.borderMiddle[1], width - 2) ~ this.borderMiddle[2];
     }
 
     /**
@@ -62,7 +70,7 @@ class Printer {
         if (content.length > width - 4)
             content = format("%-.*s...", width - 7, content);
 
-        return format("%s %-*s %s", vbchar, width - 4, content, vbchar);
+        return format("%s %-*s %s", to!string(borderContent[0]), width - 4, content, to!string(borderContent[2]));
     }
 
     string[] printList(List list) {
@@ -84,9 +92,9 @@ class Printer {
      */
     string[] printList(List list, int height) {
 	    string[] render;
-	    render ~= getRowOuter(listWidth);
-	    render ~= format("%s   %-*s %s", vbchar, listWidth - 6, list.name, vbchar);
-	    render ~= getRowInner(listWidth);
+	    render ~= to!string(getRowOuter(listWidth, false));
+	    render ~= format("%s   %-*s %s", to!string(borderContent[0]), listWidth - 6, list.name, to!string(borderContent[2]));
+	    render ~= to!string(getRowInner(listWidth));
 
 	    for (int i = 0; i < list.tasks.length || i < height; i++) {
 	    	if (i < list.tasks.length) {
@@ -97,7 +105,7 @@ class Printer {
 	    	}
 	    }
 
-	    render ~= getRowOuter(listWidth);
+	    render ~= to!string(getRowOuter(listWidth, true));
 	    return render;
     }
 
@@ -110,7 +118,7 @@ class Printer {
     string[] printListWithoutTable(List list) {
       string[] render;
       render ~= list.name;
-      render ~= getRowOuter(listWidth);
+      render ~= replicate(to!string(borderMiddle[1]), this.listWidth);
       foreach (task; list.tasks) {
         render ~= format("%s: %s", task.humanId, task.name); // TODO: implement listModePreserveWidth checking
       }                                                      // possibly look at D string formatting functionality
@@ -140,7 +148,7 @@ class Printer {
         } else {
           print.length = rows.length;
           for (int i = 0; i < rows.length; i++) {
-      			print[i] ~= rows[i][(x > 0 ? 1 : 0) .. $];
+      			print[i] ~= rows[i][(x > 0 ? to!string(this.borderTop[0]).length : 0) .. $];
       		}
         }
     	}
