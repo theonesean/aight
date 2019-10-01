@@ -153,7 +153,7 @@ void main(string[] args) {
 		writeln("    ", expandTilde("~/.config/aight.conf"));
 		writeln();
 		writeln("aight@0.0.1 ", args[0]);
-		writeln("    https://github.com/theonesean/AIGHT");
+		writeln("    https://github.com/theonesean/aight");
 		writeln();
 		return;
 	}
