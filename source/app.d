@@ -101,7 +101,7 @@ void runMain(TaskProvider provider, ConfigGroup conf) {
 	}
 }
 
-void runList(TaskProvider provider, string listName) {
+void runList(TaskProvider provider, string listName, ConfigGroup conf) {
 	List list;
 	try {
 		list = provider.getList(listName);
@@ -110,14 +110,10 @@ void runList(TaskProvider provider, string listName) {
 		return;
 	}
 
-	writeln();
-	writeln("List:");
-	writeln("  ", list.name);
-	writeln();
-	foreach(task; list.tasks) {
-		writeln(format("%s: %s", task.humanId, task.name));
+	auto printer = new Printer(conf);
+	foreach (str; printer.printList(list)) {
+		writeln(str);
 	}
-	writeln();
 }
 
 void runShow(TaskProvider provider, string taskName) {
@@ -163,7 +159,7 @@ void main(string[] args) {
 	if (args.length > 2 && args[1] == "show") {
 		run = (TaskProvider provider, ConfigGroup config) => runShow(provider, args[2]);
 	} else if (args.length > 2 && canFind(["list", "yinz", "yall", "yous"], args[1])) {
-		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2]);
+		run = (TaskProvider provider, ConfigGroup config) => runList(provider, args[2], conf);
 	} else if (args.length > 1 && canFind(["list-providers", "peeps", "folx"], args[1])) {
 		runDebugProviders(conf.services);
 		return;

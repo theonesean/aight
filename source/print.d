@@ -74,9 +74,13 @@ class Printer {
 	}
 
 	string[] printList(List list) {
+		return printList(list, list.tasks.length);
+	}
+
+	string[] printList(List list, ulong height) {
 		return ("list" == this.displayMode)
 			? this.printListWithoutTable(list)
-			: this.printList(list, this.listWidth * 2);
+			: this.printListWithTable(list, height);
 	}
 
 	/**
@@ -86,7 +90,7 @@ class Printer {
 	 * @param list          The List to be formatted.
 	 * @param height        The height of the table.
 	 */
-	string[] printList(List list, int height) {
+	string[] printListWithTable(List list, ulong height) {
 		string[] render;
 		render ~= to!string(getRowOuter(listWidth, false));
 		render ~= format("%s   %-*s %s", to!string(borderContent[0]), listWidth - 6, list.name, to!string(borderContent[2]));
@@ -135,7 +139,7 @@ class Printer {
 		string[] print;
 
 		foreach (x, list; lists) {
-			string[] rows = isList ? printList(list) : printList(list, size);
+			string[] rows = printList(list, size);
 
 			if (lists.length == 1) {
 				print = rows;
