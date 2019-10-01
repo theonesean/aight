@@ -89,5 +89,5 @@ abstract class TaskProvider {
 
 		throw new Exception("Couldn't resolve task: " ~ id);
 	}
-	
+
 }

@@ -99,7 +99,7 @@ class Printer {
 		for (int i = 0; i < list.tasks.length || i < height; i++) {
 			if (i < list.tasks.length) {
 				Task task = list.tasks[i];
-				render ~= getRowContent(listWidth, format("%s: %s", task.humanId, task.name));
+				render ~= getRowContent(listWidth, format("%03d: %s", parse!int(task.humanId), task.name));
 			} else {
 				render ~= getRowContent(listWidth, " ");
 			}
@@ -120,7 +120,7 @@ class Printer {
 		render ~= list.name;
 		render ~= replicate(to!string(borderMiddle[1]), this.listWidth);
 		foreach (task; list.tasks) {
-			render ~= format("%s: %s", task.humanId, task.name); // TODO: implement listModePreserveWidth checking
+			render ~= format("%03d: %s", parse!int(task.humanId), task.name); // TODO: implement listModePreserveWidth checking
 		}                                                        // possibly look at D string formatting functionality
 		render ~= " ";
 
