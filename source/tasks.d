@@ -8,7 +8,7 @@ import providers.github.issues;
 import providers.github.projects;
 
 bool isTaskProvider(ConfigGroup config) {
-    return config.key != "exec";
+	return config.key != "exec";
 }
 
 /**
@@ -26,68 +26,68 @@ bool isTaskProvider(ConfigGroup config) {
  * @throws Exception if the configuration is incomplete.
  */
 TaskProvider getTaskProvider(ConfigGroup config) {
-    switch (config.key) {
-        case "trello":
-            return new TrelloTaskProvider(config);
-        case "github":
-            return new GitHubIssuesTaskProvider(config);
-        case "github-projects":
-            return new GitHubProjectsTaskProvider(config);
-        case "exec":
-            auto command = executeShell(config.setting("command"));
-            writeln(command.output);
-            return null;
-        default:
-            throw new Exception("Cannot resolve group key ", config.key);
-    }
+	switch (config.key) {
+		case "trello":
+			return new TrelloTaskProvider(config);
+		case "github":
+			return new GitHubIssuesTaskProvider(config);
+		case "github-projects":
+			return new GitHubProjectsTaskProvider(config);
+		case "exec":
+			auto command = executeShell(config.setting("command"));
+			writeln(command.output);
+			return null;
+		default:
+			throw new Exception("Cannot resolve group key ", config.key);
+	}
 }
 
 struct Task {
-    string id;
-    string humanId;
-    string url;
-    string name;
-    string desc;
+	string id;
+	string humanId;
+	string url;
+	string name;
+	string desc;
 }
 
 struct List {
-    string id;
-    string name;
-    Task[] tasks;
+	string id;
+	string name;
+	Task[] tasks;
 }
 
 abstract class TaskProvider {
 
-    ConfigGroup config;
+	ConfigGroup config;
 
-    this(ConfigGroup config) {
-        this.config = config;
-    }
+	this(ConfigGroup config) {
+		this.config = config;
+	}
 
-    /**
-     * Get an array of the task lists that are
-     * able to be provided.
-     */
-    abstract List[] getLists();
+	/**
+	 * Get an array of the task lists that are
+	 * able to be provided.
+	 */
+	abstract List[] getLists();
 
-    List getList(string name) {
-        foreach (list; this.getLists()) {
-            if (list.name == name)
-                return list;
-        }
+	List getList(string name) {
+		foreach (list; this.getLists()) {
+			if (list.name == name)
+				return list;
+		}
 
-        throw new Exception("Couldn't resolve list: " ~ name);
-    }
+		throw new Exception("Couldn't resolve list: " ~ name);
+	}
 
-    Task getTask(string id) {
-        foreach (list; this.getLists()) {
-            foreach (task; list.tasks) {
-                if (task.humanId == id)
-                    return task;
-            }
-        }
+	Task getTask(string id) {
+		foreach (list; this.getLists()) {
+			foreach (task; list.tasks) {
+				if (task.humanId == id)
+					return task;
+			}
+		}
 
-        throw new Exception("Couldn't resolve task: " ~ id);
-    }
-    
+		throw new Exception("Couldn't resolve task: " ~ id);
+	}
+	
 }
