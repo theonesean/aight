@@ -3,6 +3,7 @@ module tasks;
 import std.stdio;
 import config: ConfigGroup;
 import std.process: executeShell;
+import core.stdc.signal;
 import providers.trello;
 import providers.github.issues;
 import providers.github.projects;
@@ -33,9 +34,11 @@ TaskProvider getTaskProvider(ConfigGroup config) {
 			return new GitHubIssuesTaskProvider(config);
 		case "github-projects":
 			return new GitHubProjectsTaskProvider(config);
-		case "exec":
+	        case "exec":
+		        // signal(SIGSEGV, SIG_IGN);
 			auto command = executeShell(config.setting("command"));
-			writeln(command.output);
+			if (command.status != 0) writeln("Shell failed.");
+			if (command.output) writeln(command.output);
 			return null;
 		default:
 			throw new Exception("Cannot resolve group key ", config.key);
