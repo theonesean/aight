@@ -122,7 +122,8 @@ class Config : ConfigGroup {
 	}
 
 	void initConfigFile(string location) {
-		IniLikeFile file = new IniLikeFile(location);
+	        IniLikeFile file = new IniLikeFile(location,
+						   IniLikeFile.ReadOptions(IniLikeFile.DuplicateGroupPolicy.preserve));
 
 		foreach (group; file.byGroup()) {
 			string[string] groupRef;
