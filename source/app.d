@@ -30,6 +30,9 @@ bool matches(ConfigGroup group) {
 		// TODO: replace with actual libgit2 binding
 		auto command = executeShell("git ls-remote --get-url");
 		if (command.status == 0 && globMatch(command.output, matchRemote)) {
+			if (group.isSetting("verbose"))
+				writeln("Matched glob " ~ matchRemote ~ " to " ~ command.output);
+
 			// capture github repo & provide default repo variable for issue/project boards
 			auto capture = matchFirst(command.output[0 .. $-1], r"^(https|git)(:\/\/|@)(?:www\.)?([^\/:]+)\.([a-z]+)(\/|:)(.*?)(?:\.git)?$");
 			if (capture)
@@ -81,7 +84,7 @@ void runDebugProviders(ConfigGroup[] services) {
 		if (!isTaskProvider(service))
 			continue;
 
-		try {
+		if (isActive) try {
 			// execute task provider & check for errors
 			getTaskProvider(service);
 		} catch (Exception e) {
