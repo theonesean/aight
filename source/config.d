@@ -122,8 +122,10 @@ class Config : ConfigGroup {
 	}
 
 	void initConfigFile(string location) {
-	        IniLikeFile file = new IniLikeFile(location,
-						   IniLikeFile.ReadOptions(IniLikeFile.DuplicateGroupPolicy.preserve));
+	    IniLikeFile file = new IniLikeFile(location,
+			// preserve duplicate groups in config file
+			// ref: https://github.com/FreeSlave/inilike/blob/c1e5a6b2b6a858259fe4b298e8ac3da74e048e64/source/inilike/file.d#L1427
+			IniLikeFile.ReadOptions(IniLikeFile.DuplicateGroupPolicy.preserve));
 
 		foreach (group; file.byGroup()) {
 			string[string] groupRef;
