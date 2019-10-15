@@ -1,5 +1,7 @@
 module util.hasher;
 
+import std.stdio: writeln;
+
 class Hasher {
 
 	private string[ulong] hashCodes;
@@ -24,4 +26,16 @@ class Hasher {
 		} else return false;
 	}
 
+}
+
+///
+unittest {
+	Hasher hasher = new Hasher();
+	hasher.restrict(1);
+	ulong a = hasher.hash("apple");
+	ulong b = hasher.hash("banana");
+	assert(a != b, "Hash nums shouldn't be duplicated.");
+	assert(a != 1 && b != 1, "Restricted values should be respected.");
+
+	writeln("util/hasher.d ----- CHECK");
 }
