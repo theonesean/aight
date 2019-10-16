@@ -1,25 +1,28 @@
-# AIGHT
+AIGHT
+[![Build status](https://github.com/theonesean/aight/workflows/Dlang%20Package/badge.svg)](https://github.com/theonesean/aight/actions)
+=======
 
 AIGHT is a command-line tool for getting todo tasks quickly.
 
 ## Building
 
+Make sure you've installed the [dlang compiler](https://dlang.org/download.html) (dmd) on your system.
+
 ```bash
 git clone https://github.com/theonesean/aight.git
-make && make install
+sudo make install
 ```
 
 ## Configuration
 
-The program looks for its config file in `~/.aight.conf`, `~/.config/aight.conf`, and `/etc/aight.conf`, in that order. It uses an [INI-like](https://github.com/FreeSlave/inilike) format, with each group representing a different project/task implementation (Trello, GitHub Projects, etc...).
+The program looks for its config file in `~/.aight.conf`, `~/.config/aight.conf`, and `/etc/aight.conf`, in that order. It uses an [INI-like](https://github.com/FreeSlave/inilike) format, with each group representing a different project/task implementation (Trello, GitHub Projects, [etc...](https://github.com/theonesean/aight/issues?q=is%3Aopen+is%3Aissue+label%3Anew-provider)).
 
 There are two "predefined" groups that can only exist once. These should appear at the start of your file. `[settings]` refers to global settings that affect the entire program, such as the table width or separation characters. The `[defaults]` group specifies default values for all of the groups that follow it. For instance, if you are defining many Trello configurations for the same account, you may not want to repeat the API key/token each time.
 
 ```ini
 [settings]
 listWidth=40
-borderCharHorizontal=-
-borderCharVertical=|
+displayMode=table
 
 [defaults]
 trelloApiKey=a Trello API developer key
@@ -28,7 +31,16 @@ trelloApiToken=your Trello token
 
 ### Display Modes
 
-By default, `aight` will attempt to display multiple task lists (for example, multiple lists within a single Trello board) in ASCII table format, using the `listWidth` and `borderChar` settings and your terminal window width. If you would prefer to have multiple lists displayed one after the other, set `displayMode=list`.
+By default, `aight` will attempt to display multiple task lists (for example, multiple lists within a single Trello board) in ASCII table format, using the `listWidth` and `border*` settings and your terminal window width. If you would prefer to have multiple lists displayed one after the other, set `displayMode=list`.
+
+The border settings use unicode values by default. To change this behavior, specify three-character strings in your config file with each index representing the left, middle, and right char in the border.
+
+```ini
+borderTop=╔═╗
+borderContent=║ ║
+borderMiddle=╟─╢
+borderBottom=╚═╝
+```
 
 **Note:** While in `displayMode=list`, by default, tasks in a list will not respect `listWidth`. To force a width in list mode, set `listModePreserveWidth=true`.
 
@@ -84,9 +96,3 @@ This just executes the given command.
 [exec]
 command=cat ./TODO.md
 ```
-
-## Improvements
-
-* Integration with GitHub Projects
-* Ability to filter cards by tag / status
-* Allow multiple providers to match the same repo
