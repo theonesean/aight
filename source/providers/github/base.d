@@ -1,6 +1,6 @@
 module providers.github.base;
 
-import std.net.curl: get, HTTP;
+import std.net.curl: get, patch, HTTP;
 import std.stdio;
 import tasks;
 import config: ConfigGroup;
@@ -32,6 +32,27 @@ abstract class GitHubTaskProvider : TaskProvider {
 			endpoint = "https://api.github.com/" ~ endpoint;
 
 		char[] str = get(endpoint, client);
+		return str;
+	}
+
+	/**
+	 * Send an authenticated PATCH request to a particular
+	 * endpoint of the GitHub API.
+	 * 
+	 * @param endpoint          The endpoint to send the request to.
+	 */
+	char[] requestPatch(string endpoint, string data) {
+		auto client = HTTP();
+		client.addRequestHeader("Authorization", "bearer " ~ this.token);
+		client.addRequestHeader("Accept", "application/vnd.github.inertia-preview+json");
+
+		if (this.config.isSetting("verbose"))
+			writeln("PATCH github:", endpoint);
+
+		if (endpoint[0 .. 4] != "http")
+			endpoint = "https://api.github.com/" ~ endpoint;
+
+		char[] str = patch(endpoint, data, client);
 		return str;
 	}
 

@@ -90,4 +90,8 @@ abstract class TaskProvider {
 		throw new Exception("Couldn't resolve task: " ~ id);
 	}
 
+	void closeTask(Task task) {
+		throw new Exception("Couldn't yeet task: " ~ task.humanId);
+	}
+
 }

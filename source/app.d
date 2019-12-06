@@ -131,6 +131,16 @@ void runShow(TaskProvider provider, string taskName) {
 	writeln();
 }
 
+void runClose(TaskProvider provider, string taskName) {
+	Task task = provider.getTask(taskName);
+
+	provider.closeTask(task);
+
+	writeln();
+	writeln("Yeeted task: " ~ task.name);
+	writeln();
+}
+
 void main(string[] args) {
 	Config conf = new Config(args);
 	if (conf.helpWanted) {
@@ -163,6 +173,8 @@ void main(string[] args) {
 	} else if (args.length > 1 && canFind(["list-providers", "peeps", "folx"], args[1])) {
 		runDebugProviders(conf.services);
 		return;
+	} else if (args.length > 1 && canFind(["yeet"], args[1])) {
+		run = (TaskProvider provider, ConfigGroup config) => runClose(provider, args[2]);
 	}
 
 	selectProvider(conf.services, run);
