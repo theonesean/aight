@@ -48,7 +48,7 @@ class GitHubIssuesTaskProvider : GitHubTaskProvider {
 	}
 
 	override void closeTask(Task task) {
-		string data = `{state: "closed"}`;
+		string data = `{ "state": "closed" }`;
 
 		char[] req = this.requestPatch("repos/" ~ this.repo ~ "/issues/" ~ task.humanId, data);
 	}
