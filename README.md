@@ -1,4 +1,4 @@
-# AIGHT
+# AIGHT 🤠
 
 AIGHT is a command-line tool for getting todo tasks quickly.
 
