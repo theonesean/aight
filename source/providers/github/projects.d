@@ -16,8 +16,8 @@ class GitHubProjectsTaskProvider : GitHubTaskProvider {
 
 	this(ConfigGroup config) {
 		super(config);
-		this.repo = config.setting("githubRepo");
 		this.projectId = config.setting("githubProjectId", null);
+		this.repo = projectId != null ? config.setting("githubRepo", null) : config.setting("githubRepo");
 		this.hasher = new Hasher();
 	}
 
@@ -65,7 +65,7 @@ class GitHubProjectsTaskProvider : GitHubTaskProvider {
 	override List[] getLists() {
 		JSONValue project = null;
 		if (this.projectId) {
-			project = parseJSON(this.request("repos/" ~ repo ~ "/projects/" ~ projectId));
+			project = parseJSON(this.request("projects/" ~ projectId));
 		} else {
 			project = parseJSON(this.request("repos/" ~ repo ~ "/projects")).array[0];
 		}
