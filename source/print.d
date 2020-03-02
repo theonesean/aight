@@ -37,6 +37,17 @@ class Printer {
 		return to!dstring(replicate(to!string(str), num));
 	}
 
+	///
+	unittest {
+		// setup environment
+		string[string] settings;
+		Printer prtr = new Printer(new ConfigGroup("h", settings));
+
+		// tests
+		dstring str = prtr.dreplicate('-', 5);
+		assert(str == "-----");
+	}
+
 	/**
 	 * Get the string to represent an outer row.
 	 *
@@ -48,6 +59,32 @@ class Printer {
 		else return this.borderTop[0] ~ dreplicate(this.borderTop[1], width - 2) ~ this.borderTop[2];
 	}
 
+	///
+	unittest {
+		// setup environment
+		string[string] settings;
+		settings["borderTop"] = ",-.";
+		settings["borderBottom"] = "`-'";
+		Printer prtr = new Printer(new ConfigGroup("h", settings));
+
+		// tests
+		dstring str = prtr.getRowOuter(5, false);
+		assert(str == ",---.", "Outer/top row chars");
+		str = prtr.getRowOuter(8, true);
+		assert(str == "`------'", "Outer/bottom row chars");
+
+		// setup environment
+		settings["borderTop"] = "╔═╗";
+		settings["borderBottom"] = "╚═╝";
+		prtr = new Printer(new ConfigGroup("h", settings));
+
+		// tests
+		str = prtr.getRowOuter(5, false);
+		assert(str == "╔═══╗", "Unicode outer/top row chars");
+		str = prtr.getRowOuter(8, true);
+		assert(str == "╚══════╝", "Unicode outer/bottom row chars");
+	}
+
 	/**
 	 * Get the string to represent an inner row.
 	 *
@@ -55,6 +92,18 @@ class Printer {
 	 */
 	dstring getRowInner(int width) {
 		return this.borderMiddle[0] ~ dreplicate(this.borderMiddle[1], width - 2) ~ this.borderMiddle[2];
+	}
+
+	///
+	unittest {
+		// setup environment
+		string[string] settings;
+		settings["borderMiddle"] = "|-|";
+		Printer prtr = new Printer(new ConfigGroup("h", settings));
+
+		// tests
+		dstring str = prtr.getRowInner(5);
+		assert(str == "|---|", "Middle row chars");
 	}
 
 	/**
