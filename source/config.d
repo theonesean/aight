@@ -4,6 +4,10 @@ import std.getopt: getopt;
 import std.exception;
 import std.stdio;
 import std.path: expandTilde;
+import std.string;
+import std.process: environment;
+import std.conv;
+import core.stdc.stdlib: getenv;
 import inilike.file;
 
 class ConfigGroup {
@@ -51,7 +55,13 @@ class ConfigGroup {
 	 */
 	string setting(string id) {
 		if ((id in this.settings) !is null) {
-			return this.settings[id];
+			string val = this.settings[id];
+			if (val[0] == '$') {
+				val = environment.get(val[1..$], val);
+				//val = to!string(getenv(toStringz(val[1..$])));
+			}
+
+			return val;
 		} else {
 			throw new Exception("Failed to find setting " ~ id ~ " in group " ~ key);
 		}
@@ -122,7 +132,7 @@ class Config : ConfigGroup {
 	}
 
 	void initConfigFile(string location) {
-	        IniLikeFile file = new IniLikeFile(location,
+	    IniLikeFile file = new IniLikeFile(location,
 						   IniLikeFile.ReadOptions(IniLikeFile.DuplicateGroupPolicy.preserve));
 
 		foreach (group; file.byGroup()) {

@@ -74,8 +74,8 @@ void runDebugProviders(ConfigGroup[] services) {
 
 		// log settings values (only if active)
 		if (isActive) foreach (setting; service.settings.byKeyValue()) {
-			if (setting.key.length < 5 || setting.key[$-5 .. $] != "Token") // don't show tokens
-				writeln("  ", setting.key, ": ", setting.value);
+			if (service.isSetting("verbose") || setting.key.length < 5 || (setting.key[$-5 .. $] != "Token" && setting.key[$-3 .. $] != "Key")) // don't show tokens
+				writeln("  ", setting.key, ": ", service.setting(setting.key));
 		}
 
 		if (!isTaskProvider(service))
